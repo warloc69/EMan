@@ -1,4 +1,4 @@
-package exception;
+package exceptions;
 /**
 * Class create exception DataValidateException.
 * This exception calls, when got incorrect data.

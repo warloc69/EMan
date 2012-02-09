@@ -1,5 +1,5 @@
 package model;
-import exception.*;
+import java.math.*;
 /**
 * Interface presents access to the object IOffice
 */
@@ -23,25 +23,21 @@ public interface IOffice {
     /**
     * method inserts into the object the address.
 	* @param adr inserting address. 
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setAddress(String adr) throws DataValidateException;
+    public void setAddress(String adr);
     /**
     * method sets office's identifier
 	* @param id inserting id.
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setID(BigInteger id) throws DataValidateException;
+    public void setID(BigInteger id);
     /**
     * method sets manager's identifier 
 	* @param id inserting id.
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setManagerID(BigInteger id) throws DataValidateException;
+    public void setManagerID(BigInteger id) ;
     /**
     * method sets office's title. 
 	* @param title inserting title
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setTitle(String title) throws DataValidateException;
+    public void setTitle(String title);
 }

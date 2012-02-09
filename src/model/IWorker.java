@@ -1,9 +1,13 @@
 package model;
-import exception.*;
+import java.math.*;
 /**
 * Interface presents access to the object IWorker
 */
 public interface IWorker {
+	/**
+	 * method return worker id.
+	 */
+	public BigInteger getID();
 	/**
 	* Method returns department's identifier.
 	*/
@@ -35,50 +39,42 @@ public interface IWorker {
 	/**
     * method sets department's identifier
 	* @param id inserting identifier.
-    * @throws DataValidateException if inserting data incorrect.
     */
-	public void setDepartmentID(BigInteger id) throws DataValidateException;
+	public void setDepartmentID(BigInteger id);
 	/**
 	 * method inserts worker's first name.
 	 * @param name is worker's first name.
-	 * @throws DataValidateException if inserting data incorrect.
 	 */
-	public void setFirstName(String name) throws DataValidateException;
+	public void setFirstName(String name);
 	/**
     * method sets worker's identifier
 	* @param id inserting identifier.
-    * @throws DataValidateException if inserting data incorrect.
     */
-	public void setID(BigInteger id) throws DataValidateException;
+	public void setID(BigInteger id);
 	/**
     * method sets job's identifier
 	* @param id inserting identifier.
-    * @throws DataValidateException if inserting data incorrect.
     */
-	public void setJobID(BigInteger id) throws DataValidateException;
+	public void setJobID(BigInteger id);
     /**
 	 * method inserts worker's last name.
 	 * @param name is worker's last name.
-	 * @throws DataValidateException if inserting data incorrect.
 	 */
-	public void setLastName(String name) throws DataValidateException;
+	public void setLastName(String name);
     /**
     * method sets manager's identifier 
 	* @param id inserting id.
-    * @throws DataValidateException if inserting data incorrect.
     */
-	public void setManagerID(BigInteger id) throws DataValidateException;
+	public void setManagerID(BigInteger id);
 	/**
     * method sets office's identifier
 	* @param id inserting id.
-    * @throws DataValidateException if inserting data incorrect.
     */
-	public void setOfficeID(BigInteger ID) throws DataValidateException;
+	public void setOfficeID(BigInteger id);
 	/**
 	 * method sets worker's salegrade.
 	 * @param sale is worker's salegrade.
-	 * @throws DataValidateException if inserting data incorrect.
 	 */
-	public void setSalegrade(int sale) throws DataValidateException;
+	public void setSalegrade(int sale);
 
 }

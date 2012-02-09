@@ -1,5 +1,5 @@
 package model;
-import javax.servlet.http.*
+import javax.servlet.http.*;
 /**
 * Interface presents access to the some objects that processes the request.
 */

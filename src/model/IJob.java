@@ -1,5 +1,5 @@
 package model;
-import exception.*;
+import java.math.*;
 /**
 * Interface presents access to the object IJob
 */
@@ -19,19 +19,16 @@ public interface IJob {
     /**
     * method sets job's identifier
 	* @param id inserting identifier.
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setID(BigInteger id) throws DataValidateException;
+    public void setID(BigInteger id);
     /**
     * method sets job's title. 
 	* @param title inserting title
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setTitle(String title) throws DataValidateException;
+    public void setTitle(String title) ;
 	/**
     * method sets job's description. 
 	* @param desc inserting description
-    * @throws DataValidateException if inserting data incorrect.
     */
-    public void setDescription(String desc) throws DataValidateException;
+    public void setDescription(String desc) ;
 }

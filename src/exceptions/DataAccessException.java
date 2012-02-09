@@ -1,4 +1,4 @@
-package exception;
+package exceptions;
 /**
 * Class create exception DataAccessException.
 * This exception calls, when we can't work with Data Source.
