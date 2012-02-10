@@ -1,6 +1,6 @@
 package model;
 
-public class OraclePrepareCommands {
+public class OracleDataAccessorConst {
 	//dept 
 	public static final String ADD_DEPT = "INSERT INTO DEPT(ID,TITLE,DESCRIPTION) VALUES(getid(),?,?);";
 	public static final String GET_ALL_DEPTS = "SELECT ID,TITLE,DESCRIPTION FROM DEPT;";

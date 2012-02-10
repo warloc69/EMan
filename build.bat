@@ -1,0 +1,2 @@
+ant war
+pause

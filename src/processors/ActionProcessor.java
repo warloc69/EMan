@@ -1,4 +1,4 @@
-package model;
+package processors;
 import javax.servlet.http.*;
 /**
 * Interface presents access to the some objects that processes the request.

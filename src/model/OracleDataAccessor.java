@@ -21,7 +21,11 @@ import exceptions.DataAccessException;
 
 public final class OracleDataAccessor implements IDataAccessor {
 	private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(OracleDataAccessor.class);
-	private Connection getConnection() {
+	/**
+	 * return new connection to the DataSource.
+	 * @throws DataAccessException if class can't get access to DataSource.
+	 */
+	private Connection getConnection() throws DataAccessException{
 		Connection connection = null;
 		try {
 			Context context = new InitialContext();		
@@ -30,17 +34,26 @@ public final class OracleDataAccessor implements IDataAccessor {
 			return connection;
 		} catch (NamingException e) {
 			log.error("OracleDataAccesor context error",e);
+			throw new DataAccessException("OracleDataAccesor context error",e);
 		} catch (SQLException e1) {
 			log.error("OracleDateAccessor sql error",e1);
+			throw new DataAccessException("OracleDateAccessor sql error",e1);
 		}
-		return null;
 	}
-	private void resClean (Connection con, PreparedStatement prep, ResultSet rset) {
+	/**
+	 * Free all resource after run some method.
+	 * @param con Connection's object to DataSource for clean 
+	 * @param prep PreparedStatement for clean.
+	 * @param rset ResultSet for clean.
+	 * @throws DataAccessException if can't get access to some parameter 
+	 */
+	private void resClean (Connection con, PreparedStatement prep, ResultSet rset) throws DataAccessException{
 		if(rset!=null) {
 			try {
 				rset.close();
 			} catch (SQLException e) {
 				log.error("can't close ResultSet",e);
+				throw new DataAccessException("can't close ResultSet",e);
 			}
 		}
 		if(prep!=null) {
@@ -48,6 +61,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 				prep.close();
 			} catch (SQLException e) {
 				log.error("can't close PreparedStatemets ",e);
+				throw new DataAccessException("can't close PreparedStatemets ",e);
 			}
 		}
 		if(con!=null) {
@@ -55,14 +69,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 				con.close();
 			} catch (SQLException e) {
 				log.error("can't close Connection",e);
+				throw new DataAccessException("can't close Connection",e);
 			}
 		}
 	}
 	public OracleDataAccessor() {
 		org.apache.log4j.PropertyConfigurator.configure("log4j.properties");
 	}
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#addDept(model.IDept)
+	/**
+	 * method adds department into data source.
+	 * @param dept adder department
+	 * @throws DataAccessException if got data source error.
 	 */
 	@Override
 	public void addDept(IDept dept) throws DataAccessException {
@@ -71,26 +88,28 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.ADD_DEPT);
+			prep = connection.prepareStatement(OracleDataAccessorConst.ADD_DEPT);
 			prep.setString(1, dept.getTitle());
 			prep.setString(2, dept.getDescription());
 			prep.executeUpdate();
 			connection.commit();
 		} catch (SQLException e) {
-			log.error("addDept sql error",e);
+			log.error("add departments sql error",e);
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				log.error("addDept sql error",e);
+				log.error("can't rollback from department's table error",e);
+				throw new DataAccessException("can't close Connection",e);
 			}
 			throw new DataAccessException("addDep sql error",e);
 		} finally {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#addJob(model.IJob)
+	/**
+	 * method add job into data source.
+	 * @param job adder job
+	 * @throws DataAccessException if got data source error.
 	 */
 	@Override
 	public void addJob(IJob job) throws DataAccessException {
@@ -99,7 +118,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.ADD_JOB);
+			prep = connection.prepareStatement(OracleDataAccessorConst.ADD_JOB);
 			prep.setString(1, job.getTitle());
 			prep.setString(2, job.getDescription());
 			prep.executeUpdate();
@@ -116,10 +135,11 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#addOffice(model.IOffice)
-	 */
+	/**
+	* method add office into data source.
+	* @param off adder office
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public void addOffice(IOffice off) throws DataAccessException {
 		PreparedStatement prep = null;
@@ -127,7 +147,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.ADD_OFFICE);
+			prep = connection.prepareStatement(OracleDataAccessorConst.ADD_OFFICE);
 			prep.setString(1, off.getTitle());
 			prep.setString(2, off.getAddress());
 			prep.setBigDecimal(3, new BigDecimal(off.getManagerID()));
@@ -145,9 +165,10 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#addWorker(model.IWorker)
+	/**
+	 * method add worker into data source.
+	 * @param worker adder worker
+	 * @throws DataAccessException if got data source error.
 	 */
 	@Override
 	public void addWorker(IWorker worker) throws DataAccessException {
@@ -156,7 +177,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.ADD_WORKER);
+			prep = connection.prepareStatement(OracleDataAccessorConst.ADD_WORKER);
 			prep.setString(1, worker.getFirstName());
 			prep.setString(2, worker.getLastName());
 			prep.setBigDecimal(3, new BigDecimal(worker.getManagerID()));
@@ -179,10 +200,10 @@ public final class OracleDataAccessor implements IDataAccessor {
 		}
 
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getAllDept()
-	 */
+	/**
+	* return collection contain all departments
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public Collection<IDept> getAllDepts() throws DataAccessException {
 		PreparedStatement prep = null;
@@ -190,7 +211,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		ResultSet rset = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_ALL_DEPTS);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_DEPTS);
 			rset = prep.executeQuery();
 			LinkedList<IDept> ls = new LinkedList<IDept>();
 			while (rset.next()) {
@@ -208,17 +229,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,rset);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getAllJobs()
-	 */
+	/**
+	* return collection contain all jobs
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public Collection<IJob> getAllJobs() throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_ALL_JOBS);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_JOBS);
 			ResultSet rset = prep.executeQuery();
 			LinkedList<IJob> ls = new LinkedList<IJob>();
 			while (rset.next()) {
@@ -236,17 +257,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getAllOffice()
-	 */
+	/**
+	* return collection contain all offices
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public Collection<IOffice> getAllOffices() throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_ALL_OFFICES);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_OFFICES);
 			ResultSet rset = prep.executeQuery();
 			LinkedList<IOffice> ls = new LinkedList<IOffice>();
 			while (rset.next()) {
@@ -265,17 +286,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getAllWorker()
-	 */
+	/**
+	* return collection contain all workers
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public Collection<IWorker> getAllWorker() throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_ALL_WORKERS);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_WORKERS);
 			ResultSet rset = prep.executeQuery();
 			LinkedList<IWorker> ls = new LinkedList<IWorker>();
 			while (rset.next()) {
@@ -298,17 +319,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getDeptByID(java.math.BigInteger)
-	 */
+	/**
+	* Method returns department by identifier.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IDept getDeptByID(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_DEPTS_BY_ID);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_DEPTS_BY_ID);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			ResultSet rset = prep.executeQuery();
 			IDept dep = null;
@@ -326,17 +347,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getDeptByTitle(java.lang.String)
-	 */
+	/**
+	* Method returns department by title.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IDept getDeptByTitle(String title) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_DEPTS_BY_TITLE);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_DEPTS_BY_TITLE);
 			prep.setString(1, title);
 			ResultSet rset = prep.executeQuery();
 			IDept dep = null;
@@ -354,17 +375,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getJobByID(java.math.BigInteger)
-	 */
+	/**
+	* Method returns job by identifier.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IJob getJobByID(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_JOB_BY_ID);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_JOB_BY_ID);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			ResultSet rset = prep.executeQuery();
 			IJob job = null;
@@ -382,17 +403,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getJobByTitle(java.lang.String)
-	 */
+	/**
+	* Method returns job by title.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IJob getJobByTitle(String title) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_JOB_BY_TITLE);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_JOB_BY_TITLE);
 			prep.setString(1, title);
 			ResultSet rset = prep.executeQuery();
 			IJob job = null;
@@ -410,17 +431,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getOfficeByID(java.math.BigInteger)
-	 */
+	/**
+	* Method returns office by identifier.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IOffice getOfficeByID(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_OFFICE_BY_ID);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_OFFICE_BY_ID);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			ResultSet rset = prep.executeQuery();
 			IOffice off = null;
@@ -439,17 +460,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getOfficeByTitle(java.lang.String)
-	 */
+	/**
+	* Method returns office by title.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IOffice getOfficeByTitle(String title) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_OFFICE_BY_TITTLE);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_OFFICE_BY_TITTLE);
 			prep.setString(1, title);
 			ResultSet rset = prep.executeQuery();
 			IOffice off = null;
@@ -468,17 +489,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getWorkerByID(java.math.BigInteger)
-	 */
+	/**
+	* Method returns worker by identifier.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public IWorker getWorkerByID(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_WORKER_BY_ID);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_ID);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			ResultSet rset = prep.executeQuery();
 			IWorker worker = null;
@@ -501,17 +522,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getWorkerByLastName(java.lang.String)
-	 */
+	/**
+	* Method returns worker by last name.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public Collection<IWorker> getWorkerByLastName(String lname) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_WORKER_BY_LAST_NAME);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_LAST_NAME);
 			prep.setString(1, lname);
 			ResultSet rset = prep.executeQuery();
 			LinkedList<IWorker> ls = new LinkedList<IWorker>();
@@ -535,17 +556,17 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#getWorkerByMgrID(java.math.BigInteger)
-	 */
+	/**
+	* Method returns worker by identifier.
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public Collection<IWorker> getWorkerByMgrID(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			prep = connection.prepareStatement(OraclePrepareCommands.GET_WORKER_BY_MGR_ID);
+			prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			ResultSet rset = prep.executeQuery();
 			LinkedList<IWorker> ls = new LinkedList<IWorker>();
@@ -569,10 +590,11 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#removeDept(java.math.BigInteger)
-	 */
+	/**
+	* method remove department from data source.
+	* @param id department's identifier for removing 
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public void removeDept(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
@@ -580,7 +602,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.REMOVE_DEPT);
+			prep = connection.prepareStatement(OracleDataAccessorConst.REMOVE_DEPT);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			prep.executeUpdate();
 			connection.commit();
@@ -597,10 +619,11 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#removeJob(java.math.BigInteger)
-	 */
+	/**
+	* method remove job from data source.
+	* @param id job's identifier for removing 
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public void removeJob(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
@@ -608,7 +631,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.REMOVE_JOB);
+			prep = connection.prepareStatement(OracleDataAccessorConst.REMOVE_JOB);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			prep.executeUpdate();
 			connection.commit();
@@ -626,10 +649,11 @@ public final class OracleDataAccessor implements IDataAccessor {
 		}
 
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#removeOffice(java.math.BigInteger)
-	 */
+	/**
+	* method remove office from data source.
+	* @param id office's identifier for removing 
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public void removeOffice(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
@@ -637,7 +661,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.REMOVE_OFFICE);
+			prep = connection.prepareStatement(OracleDataAccessorConst.REMOVE_OFFICE);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			prep.executeUpdate();
 			connection.commit();
@@ -655,10 +679,11 @@ public final class OracleDataAccessor implements IDataAccessor {
 		}
 
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#removeWorker(java.math.BigInteger)
-	 */
+	/**
+	* method remove worker from data source.
+	* @param id worker's identifier for removing 
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public void removeWorker(BigInteger id) throws DataAccessException {
 		PreparedStatement prep = null;
@@ -666,7 +691,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.REMOVE_WORKER);
+			prep = connection.prepareStatement(OracleDataAccessorConst.REMOVE_WORKER);
 			prep.setBigDecimal(1, new BigDecimal(id));
 			prep.executeUpdate();
 			connection.commit();
@@ -683,10 +708,11 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#updateDept(model.IDept)
-	 */
+	/**
+	* method update department in the data source.
+	* @param id department's identifier for updating 
+	* @throws DataAccessException if got data source error.
+	*/
 	@Override
 	public void updateDept(IDept dept) throws DataAccessException {
 		PreparedStatement prep = null;
@@ -694,7 +720,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.UPDATE_DEPT);
+			prep = connection.prepareStatement(OracleDataAccessorConst.UPDATE_DEPT);
 			prep.setString(1, dept.getTitle());
 			prep.setString(2, dept.getDescription());
 			prep.setBigDecimal(3, new BigDecimal(dept.getID()));
@@ -713,9 +739,10 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#updateJob(model.IJob)
+	/**
+	 * method update job in the data source.
+	 * @param id job's identifier for updating 
+	 * @throws DataAccessException if got data source error.
 	 */
 	@Override
 	public void updateJob(IJob job) throws DataAccessException {
@@ -724,7 +751,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.UPDATE_JOB);
+			prep = connection.prepareStatement(OracleDataAccessorConst.UPDATE_JOB);
 			prep.setString(1, job.getTitle());
 			prep.setString(2, job.getDescription());
 			prep.setBigDecimal(3, new BigDecimal(job.getID()));
@@ -743,9 +770,10 @@ public final class OracleDataAccessor implements IDataAccessor {
 			resClean(connection,prep,null);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#updateOffice(model.IOffice)
+	/**
+	 * method update office in the data source.
+	 * @param id office's identifier for updating 
+	 * @throws DataAccessException if got data source error.
 	 */
 	@Override
 	public void updateOffice(IOffice off) throws DataAccessException {
@@ -754,7 +782,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.UPDATE_OFFICE);
+			prep = connection.prepareStatement(OracleDataAccessorConst.UPDATE_OFFICE);
 			prep.setString(1, off.getTitle());
 			prep.setString(2, off.getAddress());
 			prep.setBigDecimal(3, new BigDecimal(off.getManagerID()));
@@ -775,9 +803,10 @@ public final class OracleDataAccessor implements IDataAccessor {
 		}
 
 	}
-
-	/* (non-Javadoc)
-	 * @see model.IDataAccessor#updateWorker(model.IWorker)
+	/**
+	 * method update worker in the data source.
+	 * @param id worker's identifier for updating 
+	 * @throws DataAccessException if got data source error.
 	 */
 	@Override
 	public void updateWorker(IWorker worker) throws DataAccessException {
@@ -786,7 +815,7 @@ public final class OracleDataAccessor implements IDataAccessor {
 		try {
 			connection = getConnection();
 			connection.setAutoCommit(false);
-			prep = connection.prepareStatement(OraclePrepareCommands.UPDATE_WORKER);
+			prep = connection.prepareStatement(OracleDataAccessorConst.UPDATE_WORKER);
 			prep.setString(1, worker.getFirstName());
 			prep.setString(2, worker.getLastName());
 			prep.setBigDecimal(3, new BigDecimal(worker.getManagerID()));

@@ -1,0 +1,26 @@
+<Context path="/eman" docBase="eman" debug="5" reloadable="true">
+<Resource name="jdbc/myoracle" auth="Container"
+	type="javax.sql.DataSource"/>
+<ResourceParams name="jdbc/myoracle">
+	<parameter>
+		<name>factory</name>
+		<value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+	</parameter>
+	<parameter>
+		<name>driverClassName</name>
+		<value>oracle.jdbc.OracleDriver</value>
+	</parameter>
+	<parameter>
+		<name>url</name>
+		<value>jdbc:oracle:thin:@127.0.0.1:1521:xe</value>
+	</parameter>
+	<parameter>
+		<name>username</name>
+		<value>system</value>
+	</parameter>
+	<parameter>
+		<name>password</name>
+		<value>student</value>
+	</parameter>
+</ResourceParams>
+</Context>

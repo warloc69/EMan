@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<project default="build" basedir=".">
+	<property name="name" value="AntBuildJar"/>
+	<property name="src.dir" value="${basedir}/src"/>
+	<property name="build" value="${build}/classes"/>
+	<path id="libs.dir">
+		<fileset dir="lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	<target name="build" description="build" depends="clear">
+		<mkdir dir="build/eman/web-inf/classes"/>
+		<mkdir dir="build/eman/web-inf/lib"/>
+		<javac srcdir="${src.dir}"
+				destdir="build/eman/web-inf/classes"
+				debug="false"
+				deprecation="true"
+				optimize="true">
+			<classpath refid="libs.dir"/>
+		</javac>
+		<copy todir="build/eman/web-inf/classes">
+			<fileset dir="${src.dir}">
+				<include name="**/*.*"/> 
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+		<copy todir="build/eman/web-inf/lib">
+			<fileset dir="lib">
+				<include name="**/*.*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/eman/web-inf">
+			<fileset dir=".">
+				<include name="web.xml"/>
+			</fileset>
+		</copy>
+	</target>
+	<target name="war" depends="build">
+		<jar destfile="build/eman.war">
+			<fileset dir="build/eman">
+			<include name="**/*.*"/>
+			</fileset>
+		</jar>
+	</target>
+	<target name="clear" description="clear">
+		<delete dir="build"/>
+	</target>
+</project>
