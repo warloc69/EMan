@@ -1,11 +1,9 @@
 package ua.ivanchenko.eman.processors;
 import org.apache.log4j.Logger;
-
 import ua.ivanchenko.eman.exceptions.CreateProcessorException;
 import ua.ivanchenko.eman.model.IConfig;
-
 public class ActionProcessorsFactory {
-	private Logger log = Logger.getLogger("<appname>logger");
+	private Logger log = Logger.getLogger("emanlogger");
     public ActionProcessor getProcessor(String actionShortName, IConfig config) throws CreateProcessorException {    
         String actionProcessor = config.getProcessorImplByAction(actionShortName);
         if (actionProcessor != null) {

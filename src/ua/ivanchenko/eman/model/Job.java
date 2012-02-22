@@ -26,6 +26,9 @@ public class Job implements IJob {
     public void setDescription(String desc) {
         this.desc = desc;
     }
-    
+    @Override
+	public int hashCode() {
+		return id.intValue();
+	}
 
 }

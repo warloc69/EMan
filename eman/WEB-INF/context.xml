@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Context path="/eman" docBase="eman" debug="5" reloadable="true">
 <Resource name="jdbc/eman_oracle" auth="Container"
 	type="javax.sql.DataSource"/>
@@ -5,6 +6,7 @@
 	<parameter>
 		<name>factory</name>
 		<value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+		<!-- <value>org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory</value>-->
 	</parameter>
 	<parameter>
 		<name>driverClassName</name>

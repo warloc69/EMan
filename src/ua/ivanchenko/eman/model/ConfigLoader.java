@@ -8,7 +8,6 @@ import java.util.Properties;
 
 import ua.ivanchenko.eman.exceptions.ConfigLoaderException;
 public class ConfigLoader {
-
 	public static IConfig loadConfig(File f) throws ConfigLoaderException {
         Properties prop = new Properties();
         try {

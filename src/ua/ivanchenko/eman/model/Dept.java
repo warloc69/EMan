@@ -27,6 +27,8 @@ public class Dept implements IDept {
     public void setDescription(String desc) {
         this.desc = desc;
     }
-    
-
+	@Override
+	public int hashCode() {
+		return id.intValue();
+	}
 }

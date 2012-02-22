@@ -60,5 +60,8 @@ public class Worker implements IWorker {
     public void setSalegrade(double salegrade) {
         this.salegrade = salegrade;
     }
-
+    @Override
+	public int hashCode() {
+		return id.intValue();
+	}
 }

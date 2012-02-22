@@ -1,45 +1,36 @@
 package ua.ivanchenko.eman.processors;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collection;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import ua.ivanchenko.eman.exceptions.ConfigLoaderException;
 import ua.ivanchenko.eman.exceptions.DataAccessException;
-import ua.ivanchenko.eman.model.DataAccessor;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IJob;
-
-
 public class ViewJobActionProcessor implements ActionProcessor {
-	private Logger log = Logger.getLogger("<appname>logger");
-    public void process(HttpServletRequest req, HttpServletResponse resp) throws DataAccessException, ConfigLoaderException {
-        Integer get_id = (Integer) req.getAttribute("get_id");
-        switch (get_id) {
-            case ProcessorConst.GET_ALL: {
-                IDataAccessor access = DataAccessor.getInstance();
+	private Logger log = Logger.getLogger("emanlogger");
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
+        if(req.getParameter("id") != null){
                 try {
-                    Collection<IJob> jobs  = access.getAllJobs();
-                    req.setAttribute("jobs", jobs);
+                    IJob job = access.getJobByID(new BigInteger(req.getParameter("id")));
+                    req.getSession().setAttribute("j_jobs", null);
+                    req.getSession().setAttribute("j_job", job);
                     try {
-                        resp.sendRedirect("showjobs.jsp");
+                        resp.sendRedirect("index.jsp?action_id=view_job");
                     } catch (IOException e) {
                         log.error("can't redirect on the showjobs.jsp",e);
                     }
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
-                } break;
-            }
-            case ProcessorConst.GET_BY_ID: {
-                IDataAccessor access = DataAccessor.getInstance();
+                }
+                return;
+            } else if(req.getParameter("title") != null) {
                 try {
-                    IJob job = access.getJobByID((BigInteger)req.getAttribute("id"));
-                    req.setAttribute("job", job);
+                    IJob job = access.getJobByTitle(req.getParameter("title"));
+                    req.getSession().setAttribute("j_jobs", null);
+                    req.getSession().setAttribute("j_job", job);
                     try {
                         resp.sendRedirect("showjobs.jsp");
                     } catch (IOException e) {
@@ -48,24 +39,23 @@ public class ViewJobActionProcessor implements ActionProcessor {
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                 }
-                break;
-            }
-            case ProcessorConst.GET_BY_TITLE: {
-                IDataAccessor access = DataAccessor.getInstance();
+                return;
+            } else {
                 try {
-                    IJob job = access.getJobByTitle((String)req.getAttribute("title"));
-                    req.setAttribute("job", job);
+                	Collection<IJob> jobs  = access.getAllJobs();
+                    req.getSession().setAttribute("j_jobs", jobs);
                     try {
-                        resp.sendRedirect("showjobs.jsp");
+                    	if (req.getParameter("select") == null) {
+                    		resp.sendRedirect("index.jsp?action_id=view_job");
+                    	} else {
+                    		resp.sendRedirect("index.jsp?action_id=view_job&select=true");
+                    	}
                     } catch (IOException e) {
                         log.error("can't redirect on the showjobs.jsp",e);
                     }
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
-                }
-                break;
+                } return;
             }
-        } 
     }
-
 }

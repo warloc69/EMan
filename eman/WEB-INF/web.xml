@@ -6,15 +6,19 @@
     <display-name>ActionDispatcher</display-name>
     <servlet-name>ActionDispatcher</servlet-name>
     <servlet-class>ua.ivanchenko.eman.servlets.ActionDispatcher</servlet-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>config/config.properties</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>ActionDispatcher</servlet-name>
-    <url-pattern>/action</url-pattern>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
   <listener>
     <listener-class>ua.ivanchenko.eman.servlets.ApplicationServletContextListener</listener-class>
   </listener>
-   <resource-ref>
+  <resource-ref>
     <res-ref-name>jdbc/eman_oracle</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
     <res-auth>Container</res-auth>

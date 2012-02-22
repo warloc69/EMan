@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -23,24 +25,20 @@ import ua.ivanchenko.eman.exceptions.DataAccessException;
 
 
 public final class OracleDataAccessor  implements IDataAccessor {
-	private Logger log = Logger.getLogger("<appname>logger");
+	private Logger log = Logger.getLogger("emanlogger");
 	
     /**
      * return new connection to the DataSource.
      * @throws DataAccessException if class can't get access to DataSource.
      */
     private Connection getConnection() throws DataAccessException{
-    //    Connection connection = null;
+        Connection connection = null;
         try {
-           /* Context context = new InitialContext();       
+            Context context = new InitialContext();       
             DataSource source = (DataSource) context.lookup(OracleDataAccessorConst.DATA_SOURCE);
-            connection = source.getConnection();*/
-        	Context initContext = new InitialContext();
-        	Context envContext  = (Context)initContext.lookup("java:/comp/env");
-        	DataSource ds = (DataSource)envContext.lookup("jdbc/eman_oracle");
-        	Connection conn = ds.getConnection();
-           // connection.setAutoCommit(false);
-            return conn;
+            connection = source.getConnection();
+            connection.setAutoCommit(false);
+            return connection;
         } catch (NamingException e) {
             log.error("OracleDataAccesor context error",e);
             throw new DataAccessException("OracleDataAccesor context error",e);
@@ -152,7 +150,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
             prep = connection.prepareStatement(OracleDataAccessorConst.ADD_OFFICE);
             prep.setString(1, off.getTitle());
             prep.setString(2, off.getAddress());
-            prep.setBigDecimal(3, new BigDecimal(off.getManagerID()));
+            if (off.getManagerID() != null){
+            	prep.setBigDecimal(3, new BigDecimal(off.getManagerID()));
+            } else {
+            	prep.setNull(3, Types.NUMERIC);
+            }
             prep.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
@@ -180,7 +182,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
             prep = connection.prepareStatement(OracleDataAccessorConst.ADD_WORKER);
             prep.setString(1, worker.getFirstName());
             prep.setString(2, worker.getLastName());
-            prep.setBigDecimal(3, new BigDecimal(worker.getManagerID()));
+            if (worker.getManagerID() != null){
+            	prep.setBigDecimal(3, new BigDecimal(worker.getManagerID()));
+            } else {
+            	prep.setNull(3, Types.NUMERIC);
+            }
             prep.setBigDecimal(4, new BigDecimal(worker.getDepartmentID()));
             prep.setBigDecimal(5, new BigDecimal(worker.getJobID()));
             prep.setBigDecimal(6, new BigDecimal(worker.getOfficeID()));
@@ -212,7 +218,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
             connection = getConnection();
             prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_DEPTS);
             rset = prep.executeQuery();
-            LinkedList<IDept> ls = new LinkedList<IDept>();
+            Collection<IDept> ls = new ArrayList<IDept>();
             while (rset.next()) {
                 IDept dep = new Dept();
                 dep.setID(rset.getBigDecimal(1).toBigInteger());
@@ -239,7 +245,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
             connection = getConnection();
             prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_JOBS);
             ResultSet rset = prep.executeQuery();
-            LinkedList<IJob> ls = new LinkedList<IJob>();
+            Collection<IJob> ls = new ArrayList<IJob>();
             while (rset.next()) {
                 IJob job = new Job();
                 job.setID(rset.getBigDecimal(1).toBigInteger());
@@ -266,13 +272,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
             connection = getConnection();
             prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_OFFICES);
             ResultSet rset = prep.executeQuery();
-            LinkedList<IOffice> ls = new LinkedList<IOffice>();
+            Collection<IOffice> ls = new ArrayList<IOffice>();
             while (rset.next()) {
                 IOffice off = new Office();
                 off.setID(rset.getBigDecimal(1).toBigInteger());
                 off.setTitle(rset.getString(2));
                 off.setAddress(rset.getString(3));
-                off.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                if (rset.getBigDecimal(4) != null) {
+                	off.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                } else {
+                	off.setManagerID(null);
+                }
                 ls.add(off);
             }
             return ls;
@@ -294,13 +304,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
             connection = getConnection();
             prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_WORKERS);
             ResultSet rset = prep.executeQuery();
-            LinkedList<IWorker> ls = new LinkedList<IWorker>();
+            Collection<IWorker> ls = new ArrayList<IWorker>();
             while (rset.next()) {
                 IWorker worker = new Worker();
                 worker.setID(rset.getBigDecimal(1).toBigInteger());
                 worker.setFirstName(rset.getString(2));
                 worker.setLastName(rset.getString(3));
-                worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                if (rset.getBigDecimal(4) != null) {
+                	worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                } else {
+                	worker.setManagerID(null);
+                }
                 worker.setDepartmentID(rset.getBigDecimal(5).toBigInteger());
                 worker.setJobID(rset.getBigDecimal(6).toBigInteger());
                 worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
@@ -441,7 +455,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
                 off.setID(rset.getBigDecimal(1).toBigInteger());
                 off.setTitle(rset.getString(2));
                 off.setAddress(rset.getString(3));
-                off.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                if (rset.getBigDecimal(4) != null){
+                	off.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                } else {
+                	off.setManagerID(null);
+                }
             }
             return off;
         } catch (SQLException e) {
@@ -497,7 +515,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
                 worker.setID(rset.getBigDecimal(1).toBigInteger());
                 worker.setFirstName(rset.getString(2));
                 worker.setLastName(rset.getString(3));
-                worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                if (rset.getBigDecimal(4) != null){
+                	worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                } else {
+                	worker.setManagerID(null);
+                }
                 worker.setDepartmentID(rset.getBigDecimal(5).toBigInteger());
                 worker.setJobID(rset.getBigDecimal(6).toBigInteger());
                 worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
@@ -572,6 +594,34 @@ public final class OracleDataAccessor  implements IDataAccessor {
             return ls;
         } catch (SQLException e) {
             log.error("Get worker by mgr id sql error",e);
+            throw new DataAccessException("Get worker by mgr id sql error",e);
+        } finally {
+            resClean(connection,prep,null);
+        }
+    }
+    public Collection<IWorker> getTopManagers() throws DataAccessException {
+        PreparedStatement prep = null;
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_TOPMANAGER);
+            ResultSet rset = prep.executeQuery();
+            LinkedList<IWorker> ls = new LinkedList<IWorker>();
+            while (rset.next()) {
+                IWorker worker = new Worker();
+                worker.setID(rset.getBigDecimal(1).toBigInteger());
+                worker.setFirstName(rset.getString(2));
+                worker.setLastName(rset.getString(3));
+                worker.setManagerID(null);
+                worker.setDepartmentID(rset.getBigDecimal(5).toBigInteger());
+                worker.setJobID(rset.getBigDecimal(6).toBigInteger());
+                worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
+                worker.setSalegrade(rset.getDouble(8));
+                ls.add(worker);
+            }
+            return ls;
+        } catch (SQLException e) {
+            log.error("Get topmanager sql error",e);
             throw new DataAccessException("Get worker by mgr id sql error",e);
         } finally {
             resClean(connection,prep,null);
@@ -758,7 +808,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
             prep = connection.prepareStatement(OracleDataAccessorConst.UPDATE_OFFICE);
             prep.setString(1, off.getTitle());
             prep.setString(2, off.getAddress());
-            prep.setBigDecimal(3, new BigDecimal(off.getManagerID()));
+            if (off.getManagerID() != null){
+            	prep.setBigDecimal(3, new BigDecimal(off.getManagerID()));
+            } else {
+            	prep.setNull(3, Types.NUMERIC);
+            }
             prep.setBigDecimal(4, new BigDecimal(off.getID()));
             prep.executeUpdate();
             connection.commit();
@@ -789,7 +843,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
             prep = connection.prepareStatement(OracleDataAccessorConst.UPDATE_WORKER);
             prep.setString(1, worker.getFirstName());
             prep.setString(2, worker.getLastName());
-            prep.setBigDecimal(3, new BigDecimal(worker.getManagerID()));
+            if (worker.getManagerID() != null){
+            	prep.setBigDecimal(3, new BigDecimal(worker.getManagerID()));
+            } else {
+            	prep.setNull(3, Types.NUMERIC);
+            }
             prep.setBigDecimal(4, new BigDecimal(worker.getDepartmentID()));
             prep.setBigDecimal(5, new BigDecimal(worker.getJobID()));
             prep.setBigDecimal(6, new BigDecimal(worker.getOfficeID()));

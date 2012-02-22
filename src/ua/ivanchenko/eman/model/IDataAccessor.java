@@ -29,6 +29,7 @@ public interface IDataAccessor {
 	 * @throws DataAccessException if got data source error.
 	 */
 	public void addWorker(IWorker worker) throws DataAccessException;
+	public Collection<IWorker> getTopManagers() throws DataAccessException;
 	/**
 	* return collection contain all departments
 	 * @throws DataAccessException 

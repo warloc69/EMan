@@ -35,5 +35,8 @@ public class Office implements IOffice {
     public void setManagerID(BigInteger mgrid) {
         this.mgrid = mgrid;
     }
-    
+    @Override
+	public int hashCode() {
+		return id.intValue();
+	}
 }

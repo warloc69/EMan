@@ -8,8 +8,8 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="D:/tomcat/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="D:/apache-tomcat-7.0.25/lib/servlet-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="eman/WEB-INF/lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="D:/tomcat/lib/ojdbc14.jar"/>
+	<classpathentry kind="lib" path="D:/apache-tomcat-7.0.25/lib/ojdbc14.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

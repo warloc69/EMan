@@ -2,73 +2,80 @@ package ua.ivanchenko.eman.processors;
 
 import java.io.IOException;
 import java.math.BigInteger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import ua.ivanchenko.eman.exceptions.ConfigLoaderException;
 import ua.ivanchenko.eman.exceptions.DataAccessException;
-import ua.ivanchenko.eman.model.DataAccessor;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IJob;
 import ua.ivanchenko.eman.model.Job;
 
 
 public class EditJobActionProcessor implements ActionProcessor {
-	private Logger log = Logger.getLogger("<appname>logger");
-    public void process(HttpServletRequest req, HttpServletResponse resp) throws DataAccessException, ConfigLoaderException {
-        Integer action_id = (Integer) req.getAttribute("edit_id");
-        switch (action_id) {
-            case ProcessorConst.ACTION_ADD: {
-                IDataAccessor access = DataAccessor.getInstance();
-                try {
+	private Logger log = Logger.getLogger("emanlogger");
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
+    	log.info("EditJobActionProcessor{action_id:"+req.getParameter("action_id")+"} {URI:"+req.getRequestURI()+"}");
+        if("edit_job_add".equals(req.getParameter("action_id"))) {            
+        	if(req.getParameter("title")== null) {
+    			try {
+					resp.sendRedirect("editjob.jsp?action_id=edit_job_add");
+				} catch (IOException e) {
+					log.error("can't redirect on the editjob.jsp",e);
+				}
+    		} else {
+        		try {
                     IJob job  = new Job();
-                    job.setTitle((String)req.getAttribute("title"));
-                    job.setDescription((String)req.getAttribute("desc"));
+                    job.setTitle(req.getParameter("title"));
+                    job.setDescription(req.getParameter("desc"));
                     access.addJob(job);
                     try {
-                        resp.sendRedirect("showjobs.jsp");
+                        resp.sendRedirect("index.jsp?action_id=view_job");
                     } catch (IOException e) {
                         log.error("can't redirect on the showjobs.jsp",e);
                     }
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
-                } break;
-            }
-            case ProcessorConst.ACTION_UPDATE: {
-                IDataAccessor access = DataAccessor.getInstance();
+                }
+    		}
+        } else if ("edit_job_update".equals(req.getParameter("action_id"))) {
+            	log.info("EditJobActionProcessor (update){title:"+req.getParameter("title")+"} {id:"+req.getParameter("id")+"}");
+            		if(req.getParameter("title")== null) {
+            			IJob job = access.getJobByID(new BigInteger(req.getParameter("id")));
+            			req.getSession().setAttribute("e_job", job);
+            			try {
+							resp.sendRedirect("editjob.jsp?action_id=edit_job_update");
+						} catch (IOException e) {
+							log.error("can't redirect on the editjob.jsp",e);
+						}
+            		} else {
+		                try {
+		                    IJob job  = new Job();
+		                    job.setID(new BigInteger(req.getParameter("id")));
+		                    job.setTitle(req.getParameter("title"));
+		                    job.setDescription(req.getParameter("desc"));
+		                    access.updateJob(job);
+		                    try {
+		                        resp.sendRedirect("index.jsp?action_id=view_job");
+		                    } catch (IOException e) {
+		                        log.error("can't redirect on the showjobs.jsp",e);
+		                    }
+		                } catch (DataAccessException e) {
+		                    log.error("can't gets data from IDataAccessor",e);
+		                } 
+            		}
+            } else if ("edit_job_remove".equals(req.getParameter("action_id")))  {
                 try {
-                    IJob job  = new Job();
-                    job.setID((BigInteger)req.getAttribute("id"));
-                    job.setTitle((String)req.getAttribute("title"));
-                    job.setDescription((String)req.getAttribute("desc"));
-                    access.updateJob(job);
+                    access.removeJob(new BigInteger(req.getParameter("id")));
                     try {
-                        resp.sendRedirect("showjobs.jsp");
-                    } catch (IOException e) {
-                        log.error("can't redirect on the showjobs.jsp",e);
-                    }
-                } catch (DataAccessException e) {
-                    log.error("can't gets data from IDataAccessor",e);
-                } break;
-            }
-            case ProcessorConst.ACTION_REMOVE: {
-                IDataAccessor access = DataAccessor.getInstance();
-                try {
-                    access.removeJob((BigInteger)req.getAttribute("id"));
-                    try {
-                        resp.sendRedirect("showdjobs.jsp");
+                        resp.sendRedirect("index.jsp?action_id=view_job");
                     } catch (IOException e) {
                         log.error("can't redirect on the showdepts.jsp",e);
                     }
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                 }
-                break;
-            }            
-        } 
+            }              
     }
 
 }

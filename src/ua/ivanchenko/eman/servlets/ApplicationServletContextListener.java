@@ -24,7 +24,8 @@ public class ApplicationServletContextListener implements ServletContextListener
      */
     public void contextInitialized(ServletContextEvent event) {
     	ServletContext ctx = event.getServletContext();        
-    	String prefix =  ctx.getRealPath("/");    
+    	String prefix =  ctx.getRealPath("/");
+    	System.setProperty("rootPath", prefix);
     	String file = "config"+System.getProperty("file.separator")+"log4j.properties";
     	PropertyConfigurator.configure(prefix+file);
     	System.out.println("Log4J Logging started for application: " + prefix+file); 
