@@ -96,15 +96,20 @@
     log.info("from index.jsp {URI:"+request.getRequestURI()+"}");
     if (request.getParameter("select") == null) {
     %>
-    
-	    <%if ("view_dept".equals(request.getParameter("action_id"))) {%>
-	        <jsp:include page="<%= path_dept %>" />
-	        <%@ include file="showdepts.jsp" %>
+        <%if ("view_dept".equals(request.getParameter("action_id"))) {%>
+	       <%if(request.getParameter("sort")== null) {%> 
+	            <jsp:include page="<%= path_dept %>" />
+	        <% }%>
+	        <%@  include file="showdepts.jsp" %>
 	    <%} else if ("view_office".equals(request.getParameter("action_id"))) {%>
-	        <jsp:include page="<%= path_office %>" />
+	       <%if(request.getParameter("sort")== null) {%> 
+	           <jsp:include page="<%= path_office %>" />
+	       <%} %>
 	        <%@ include file="showoffices.jsp" %>
 	    <%} else if ("view_job".equals(request.getParameter("action_id"))) {%>
-	        <jsp:include page="<%= path_job %>" />
+	       <%if(request.getParameter("sort")== null) {%> 
+	           <jsp:include page="<%= path_job %>" />
+	       <%} %>
 	        <%@ include file="showjobs.jsp" %> 
 	    <%} else if ("view_worker".equals(request.getParameter("action_id"))) {%>
 			   <% if (request.getParameter("id") != null ) { %>
@@ -116,6 +121,7 @@
 	            <jsp:include page="<%= path_manager %>" />
 	        <%} %>
 	        <%@ include file="showworkers.jsp" %>
+	        
 	    <%} %>
     <%} else { %>
         <%if ("view_dept".equals(request.getParameter("action_id"))) {%>

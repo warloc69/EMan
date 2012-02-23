@@ -210,13 +210,18 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * return collection contain all departments
     * @throws DataAccessException if got data source error.
     */
-    public Collection<IDept> getAllDepts() throws DataAccessException {
+    public Collection<IDept> getAllDepts(String sort) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         ResultSet rset = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_DEPTS);
+            if (sort == null) {
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_DEPTS);
+            } else {
+            	log.info("sql : "+ OracleDataAccessorConst.GET_ALL_DEPTS+" order by "+sort);
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_DEPTS+" order by "+sort);
+            }
             rset = prep.executeQuery();
             Collection<IDept> ls = new ArrayList<IDept>();
             while (rset.next()) {
@@ -238,12 +243,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * return collection contain all jobs
     * @throws DataAccessException if got data source error.
     */
-    public Collection<IJob> getAllJobs() throws DataAccessException {
+    public Collection<IJob> getAllJobs(String sort) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_JOBS);
+            if (sort == null) {
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_JOBS);
+            } else {
+            	log.info("sql : "+ OracleDataAccessorConst.GET_ALL_JOBS+" order by "+sort);
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_JOBS+" order by "+sort);
+            }
             ResultSet rset = prep.executeQuery();
             Collection<IJob> ls = new ArrayList<IJob>();
             while (rset.next()) {
@@ -265,12 +275,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * return collection contain all offices
     * @throws DataAccessException if got data source error.
     */
-    public Collection<IOffice> getAllOffices() throws DataAccessException {
+    public Collection<IOffice> getAllOffices(String sort) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_OFFICES);
+            if (sort == null) {
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_OFFICES);
+            } else {
+            	log.info("sql : "+ OracleDataAccessorConst.GET_ALL_OFFICES+" order by "+sort);
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_OFFICES+" order by "+sort);
+            }
             ResultSet rset = prep.executeQuery();
             Collection<IOffice> ls = new ArrayList<IOffice>();
             while (rset.next()) {
@@ -297,12 +312,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * return collection contain all workers
     * @throws DataAccessException if got data source error.
     */
-    public Collection<IWorker> getAllWorkers() throws DataAccessException {
+    public Collection<IWorker> getAllWorkers(String sort) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_WORKERS);
+            if (sort == null) {
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_WORKERS);
+            } else {
+            	log.info("sql : "+ OracleDataAccessorConst.GET_ALL_WORKERS+" order by "+sort);
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_WORKERS+" order by "+sort);
+            }
             ResultSet rset = prep.executeQuery();
             Collection<IWorker> ls = new ArrayList<IWorker>();
             while (rset.next()) {
@@ -570,12 +590,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * Method returns worker by identifier.
     * @throws DataAccessException if got data source error.
     */
-    public Collection<IWorker> getWorkersByMgrID(BigInteger id) throws DataAccessException {
+    public Collection<IWorker> getWorkersByMgrID(BigInteger id, String sort) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID);
+            if (sort == null) {
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID);
+            } else {
+            	log.info("sql : "+ OracleDataAccessorConst.GET_WORKER_BY_MGR_ID+" order by "+sort);
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID+" order by "+sort);
+            }
             prep.setBigDecimal(1, new BigDecimal(id));
             ResultSet rset = prep.executeQuery();
             LinkedList<IWorker> ls = new LinkedList<IWorker>();

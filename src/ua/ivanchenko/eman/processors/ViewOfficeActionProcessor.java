@@ -17,7 +17,7 @@ public class ViewOfficeActionProcessor implements ActionProcessor {
      if(req.getParameter("id") != null) {
                 try {
                     IOffice office = access.getOfficeByID(new BigInteger(req.getParameter("id")));
-                    Collection<IWorker> workers = access.getAllWorkers();
+                    Collection<IWorker> workers = access.getAllWorkers(null);
                 	HashMap<BigInteger,String> managersname = new  HashMap<BigInteger,String>();
                 	for(IWorker worker: workers) {
                 		managersname.put(worker.getID(), worker.getLastName());             	
@@ -50,8 +50,13 @@ public class ViewOfficeActionProcessor implements ActionProcessor {
                 return;
             } else {
                 try {
-                	Collection<IOffice> offices  = access.getAllOffices();
-                	Collection<IWorker> workers = access.getAllWorkers();
+                	  Collection<IOffice> offices = null;
+                	if (req.getParameter("sort") != null) {
+                		offices  = access.getAllOffices(req.getParameter("sort"));
+                	} else {
+                		offices  = access.getAllOffices(null);
+                	}
+                	Collection<IWorker> workers = access.getAllWorkers(null);
                 	HashMap<BigInteger,String> managersname = new  HashMap<BigInteger,String>();
                 	for(IWorker worker: workers) {
                 		managersname.put(worker.getID(), worker.getLastName());             	
@@ -66,8 +71,12 @@ public class ViewOfficeActionProcessor implements ActionProcessor {
                     req.getSession().setAttribute("o_offices", offices);
                     req.getSession().setAttribute("o_manager", managersname);
                     try {
-                    	if (req.getParameter("select") == null) {
-                    		resp.sendRedirect("index.jsp?action_id=view_office");
+                      if (req.getParameter("select") == null) {
+                    	  if(req.getParameter("sort") == null) {
+                    		  resp.sendRedirect("index.jsp?action_id=view_office");
+                    	  } else {
+                    		  resp.sendRedirect("index.jsp?action_id=view_office&sort="+req.getParameter("sort"));
+                    	  }
                     	} else {
                     		resp.sendRedirect("index.jsp?action_id=view_office&select=true");
                     	}

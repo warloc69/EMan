@@ -42,11 +42,20 @@ public class ViewDeptActionProcessor implements ActionProcessor {
                 return;
             } else {
                 try {
-                	Collection<IDept> depts  = access.getAllDepts();
+                	Collection<IDept> depts = null;
+                	if (req.getParameter("sort") != null) {
+                		depts  = access.getAllDepts(req.getParameter("sort"));
+                	} else {
+                		depts  = access.getAllDepts(null);
+                	}
                     req.getSession().setAttribute("d_depts", depts);
                     try {
                     	if (req.getParameter("select") == null) {
-                    		resp.sendRedirect("index.jsp?action_id=view_dept");
+                    		if(req.getParameter("sort") == null) {
+                    			resp.sendRedirect("index.jsp?action_id=view_dept");
+                    		} else {
+                    			resp.sendRedirect("index.jsp?action_id=view_dept&sort="+req.getParameter("sort"));
+                    		}
                     	} else {
                     		resp.sendRedirect("index.jsp?action_id=view_dept&select=true");
                     	}

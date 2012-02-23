@@ -29,7 +29,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
         if("view_worker".equals(req.getParameter("action_id"))) {
                 try {
                 	log.info("ViewWorkerActionPorcessor get id {id:"+req.getParameter("id")+"}");
-                	Collection<IWorker> workers  = access.getAllWorkers();
+                	Collection<IWorker> workers  = access.getAllWorkers(null);
                     IWorker worker = access.getWorkerByID(new BigInteger(req.getParameter("id")));
                     HashSet<IWorker> managersname = new  HashSet<IWorker>();
                     for(IWorker worker1: workers) {
@@ -66,29 +66,38 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 try {
                 	log.info(" td ViewWorkerActionPorcessor get mgr_id { id:"+req.getParameter("id")+"}");
                 	Collection<IWorker> workers = null;
-                	Collection<IWorker> allworkers = access.getAllWorkers();
+                	Collection<IWorker> allworkers = null;
+                	if (req.getParameter("sort") != null) {
+                		allworkers  = access.getAllWorkers(req.getParameter("sort"));
+                	} else {
+                		allworkers  = access.getAllWorkers(null);
+                	}
                 	IWorker wor = null;
                 	if (req.getParameter("id") != null) {
-                		wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
+                			wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
                 	}
                 	if (req.getParameter("id") == null) {
                 		workers = access.getTopManagers();
                 	} else {
-                		workers = access.getWorkersByMgrID(new BigInteger(req.getParameter("id")));
+                		if (req.getParameter("sort") == null) {
+                			workers = access.getWorkersByMgrID(new BigInteger(req.getParameter("id")),null);
+                		} else {
+                			workers = access.getWorkersByMgrID(new BigInteger(req.getParameter("id")),req.getParameter("sort"));
+                		}
                 	}
                     HashMap<BigInteger,String> deptsname = new  HashMap<BigInteger,String>();
                     HashMap<BigInteger,String> managersname = new  HashMap<BigInteger,String>();
                 	HashMap<BigInteger,String> officesname = new  HashMap<BigInteger,String>();
                 	HashMap<BigInteger,String> jobsname = new HashMap<BigInteger,String>();
-                	Collection<IJob> jobs= access.getAllJobs();
+                	Collection<IJob> jobs= access.getAllJobs(null);
                 	for(IJob job: jobs){
                 		jobsname.put(job.getID(),job.getTitle());
                 	}
-                	Collection<IOffice> offices= access.getAllOffices();
+                	Collection<IOffice> offices= access.getAllOffices(null);
                 	for(IOffice office: offices){
                 		officesname.put(office.getID(),office.getTitle());
                 	}
-                	Collection<IDept> depts= access.getAllDepts();
+                	Collection<IDept> depts = access.getAllDepts(null);
                 	for(IDept dept: depts){
                 		deptsname.put(dept.getID(),dept.getTitle());
                 	}
@@ -105,15 +114,21 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                     req.getSession().setAttribute("w_manager",managersname);
                     try {
                     	if (req.getParameter("tab") == null){
-	                    	log.info("redirect to showworkers.jsp");
+	                    	
 	                    	if (req.getParameter("select") == null) {
-	                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
+	                    		if(req.getParameter("sort") == null) {
+	                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
+	                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
+	                    		} else {
+	                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
+	                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
+	                    		}
 	                    	} else {
+	                    		log.info("redirect to index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));
 	                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));
 	                    	}
-	                    	
                     	} else {
-                    		log.info("redirect to showworkers.jsp");
+                    		log.info("redirect to index.jsp?action_id=view_top_manager&tab=details&id=" + req.getParameter("id"));
 	                        resp.sendRedirect("index.jsp?action_id=view_top_manager&tab=details&id=" + req.getParameter("id"));
                     	} 
                     } catch (IOException e) {
@@ -125,20 +140,31 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
             } else {
                 try {
                 	log.info("ViewWorkerActionPorcessor get all worker");
-                	Collection<IWorker> workers  = access.getAllWorkers();
+                	Collection<IWorker> workers  = null;
+                	if (req.getParameter("sort") != null) {
+                		workers  = access.getAllWorkers(req.getParameter("sort"));
+                	} else {
+                		workers  = access.getAllWorkers(null);
+                	}
+
                 	HashMap<BigInteger,String> deptsname = new  HashMap<BigInteger,String>();
                 	HashSet<IWorker> managersname = new  HashSet<IWorker>();
                 	HashMap<BigInteger,String> officesname = new  HashMap<BigInteger,String>();
                 	HashMap<BigInteger,String> jobsname = new HashMap<BigInteger,String>();
-                	Collection<IJob> jobs= access.getAllJobs();
+                	Collection<IJob> jobs= access.getAllJobs(null);
                 	for(IJob job: jobs){
                 		jobsname.put(job.getID(),job.getTitle());
                 	}
-                	Collection<IOffice> offices= access.getAllOffices();
+                	Collection<IOffice> offices = access.getAllOffices(null);
                 	for(IOffice office: offices){
                 		officesname.put(office.getID(),office.getTitle());
                 	}
-                	Collection<IDept> depts= access.getAllDepts();
+                	Collection<IDept> depts = null;
+                	if (req.getParameter("sort") != null) {
+                		depts= access.getAllDepts(req.getParameter("sort"));
+                	} else {
+                		depts= access.getAllDepts(null);
+                	}
                 	for(IDept dept: depts){
                 		deptsname.put(dept.getID(),dept.getTitle());
                 	}

@@ -101,18 +101,18 @@
                 {
             %>
             <tr> 
-                <td>Title:</td>
+                <td><p1>Title:</p1></td>
                 <td><input name="title" value="<%=office.getTitle() %> " /></td> 
             </tr>
              <tr>
-                <td>Address:</td>
+                <td><p1>Address:</p1></td>
                 <td><input name="adr" value="<%=office.getAddress() %> " /></td> 
                 <input type="hidden" name="id" value=<%=office.getID() %> /> 
                 <input type="hidden" name="edit_id" value=1 /> 
                 <input type="hidden" name="action_id" value=edit_office_update />
                </tr>
                <tr>
-               <td>Manager:</td>
+               <td><p1>Manager:</p1></td>
                <td>
 	                <input type="text" name="man"  onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)" readonly value="<%= office.getManagerID() != null ? info.get("mgr_id") : "manager"  %>"/>
 	                <input type="hidden" name="mgr_id" value=<%=office.getManagerID() != null ? office.getManagerID() : "null" %> />
@@ -122,16 +122,16 @@
                 } else {
              %>
              <tr> 
-                <td>Title:</td>
+                <td><p1>Title:</p1></td>
                 <td><input name="title" /></td> 
             </tr>
              <tr>
-                <td>Addres:</td>
+                <td><p1>Addres:</p1></td>
                 <td><input name="adr" /></td> 
                 <input type="hidden" name="edit_id" value=0 /> 
                 <input type="hidden" name="action_id" value=edit_office_add />
                 <tr>
-               <td>Manager:</td>
+               <td><p1>Manager:</p1></td>
                <td>
                     <input type="text" name="man"  onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)" readonly value="manager"/>
                     <input type="hidden" name="mgr_id" value=1 />

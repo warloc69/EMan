@@ -11,6 +11,7 @@
 		}
 	</script>
      <%
+     log.info("show worker first");
       if( session.getAttribute("w_workers") == null && session.getAttribute("w_worker") == null) {
     	  log.info("showworker.jsp redirect to action?action_id=view_worker");
           response.sendRedirect(request.getContextPath()+"/?action_id=view_worker");
@@ -30,7 +31,13 @@
 	        <%} %>
 	        </tr>    
 	        <tr>
-	            <td></td><td><p1>First Name</p1></td><td><p1>Last Name</p1></td><td><p1>Manager</p1></td><td><p1>Job</p1></td><td><p1>Office</p1></td><td><p1>Department</p1></td><td><p1>Salegrade</p1></td>
+	            <td></td><td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=FIRSTNAME&id=<%= request.getParameter("id") %>"><p1>First Name</p1></a></td>
+	            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=LASTNAME&id=<%= request.getParameter("id") %>"><p1>Last Name</p1></a></td>
+	            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=MGRID&id=<%= request.getParameter("id") %>"><p1>Manager</p1></a></td>
+	            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=JOB_ID&id=<%= request.getParameter("id") %>"><p1>Job</p1></a></td>
+	            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=OFFICE_ID&id=<%= request.getParameter("id") %>"><p1>Office</p1></a></td>
+	            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=DEPARTMENT_ID&id=<%= request.getParameter("id") %>"><p1>Department</p1></a></td>
+	            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&sort=SALEGRADE&id=<%= request.getParameter("id") %>"><p1>Salegrade</p1></a></td>
 	        </tr>
           <%
              log.info("showworker.jsp show all table {URI:"+request.getRequestURI()+"}");
@@ -63,8 +70,10 @@
                         <td><a href="<%=request.getContextPath()%>/?action_id=view_office&id=<%= worker.getOfficeID() %>"><%= off.get(worker.getOfficeID()) %> </a>     </td>
                         <td><a href="<%=request.getContextPath()%>/?action_id=view_dept&id=<%= worker.getDepartmentID() %>"><%= depts.get(worker.getDepartmentID()) %></a>  </td>
                         <td><%= worker.getSalegrade() %>               </td>
-                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_update&id=<%= worker.getID() %>" >Edit</a></td>
-                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_remove&id=<%= worker.getID() %> " >Remove</a></td>
+                        <% if(request.getParameter("select") == null)  { %>
+                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_update&id=<%= worker.getID() %>" ><img alt="Edit" src="<%=request.getContextPath()%>/resource/edit.png" border="0"></a></td>
+                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_remove&id=<%= worker.getID() %> " ><img alt="Remove" src="<%=request.getContextPath()%>/resource/remove.png" border="0"></a></td>
+                        <%} %>
                     </tr>
     <%
                 }
@@ -136,11 +145,15 @@
                         <td><a href="<%=request.getContextPath()%>/?action_id=view_office&id=<%= worker.getOfficeID() %>"><%= off.get(worker.getOfficeID()) %> </a>     </td>
                         <td><%= depts.get(worker.getDepartmentID()) %> </td>
                         <td><%= worker.getSalegrade() %>               </td>
-                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_update&id=<%= worker.getID() %> " >Edit</a></td>
-                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_remove&id=<%= worker.getID() %> " >Remove</a></td>
+                        <%if(request.getParameter("select") == null)  { %>
+                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_update&id=<%= worker.getID() %> " ><img alt="Edit" src="<%=request.getContextPath()%>/resource/edit.png" border="0"></a></td>
+                        <td><a href="<%=request.getContextPath()%>/?action_id=edit_worker_remove&id=<%= worker.getID() %> " ><img alt="Remove" src="<%=request.getContextPath()%>/resource/remove.png" border="0"></a></td>
+                        <% } %>
                     </tr>
                     </table>
      <% 
          }
      %>
-    <a href="<%=request.getContextPath()%>/?action_id=edit_worker_add">add</a>
+       <%if(request.getParameter("select") == null)  { %>
+            <a href="<%=request.getContextPath()%>/?action_id=edit_worker_add" ><img alt="Add" src="<%=request.getContextPath()%>/resource/add.png" border="0"></a>
+        <%} %>

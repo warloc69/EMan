@@ -11,6 +11,7 @@ public class DefaultActionProcessor implements ActionProcessor {
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor accessor) {
     	try {
         	log.info("redirect to index.jsp?action_id=view_worker from DeafultActionProcessor");
+        	if(req.getParameter("sort")== null)
             resp.sendRedirect("index.jsp");
         } catch (IOException e) {
             log.error("can't redirect on the showworker.jsp",e);

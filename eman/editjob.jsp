@@ -86,11 +86,11 @@
             {
 		    %>
 			<tr> 
-			    <td>Title:</td>
+			    <td><p1>Title:</p1></td>
 			    <td><input name="title" value="<%=job.getTitle() %> " /></td> 
 			</tr>
 			 <tr>
-			    <td>Description:</td>
+			    <td><p1>Description:</p1></td>
 	            <td><input name="desc" value="<%=job.getDescription() %> " /></td> 
 	            <input type="hidden" name="id" value=<%=job.getID() %> /> 
 	            <input type="hidden" name="edit_id" value=1  /> 
@@ -100,11 +100,11 @@
 		    	} else {
 	         %>
 	         <tr> 
-                <td>Title:</td>
+                <td><p1>Title:</p1></td>
                 <td><input name="title" /></td> 
             </tr>
              <tr>
-                <td>Description:</td>
+                <td><p1>Description:</p1></td>
                 <td><input name="desc" /></td> 
                 <input type="hidden" name="edit_id" value=0 /> 
                 <input type="hidden" name="action_id" value=edit_job_add />           

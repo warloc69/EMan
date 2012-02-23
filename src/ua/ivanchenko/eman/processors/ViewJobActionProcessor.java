@@ -42,11 +42,20 @@ public class ViewJobActionProcessor implements ActionProcessor {
                 return;
             } else {
                 try {
-                	Collection<IJob> jobs  = access.getAllJobs();
+                	Collection<IJob> jobs  = null;
+                	if (req.getParameter("sort") != null) {
+                		jobs  = access.getAllJobs(req.getParameter("sort"));
+                	} else {
+                		jobs  = access.getAllJobs(null);
+                	}
                     req.getSession().setAttribute("j_jobs", jobs);
                     try {
                     	if (req.getParameter("select") == null) {
-                    		resp.sendRedirect("index.jsp?action_id=view_job");
+                    		if(req.getParameter("sort") == null) {
+                    			resp.sendRedirect("index.jsp?action_id=view_job");
+                    		} else {
+                    			resp.sendRedirect("index.jsp?action_id=view_job&sort="+req.getParameter("sort"));
+                    		}
                     	} else {
                     		resp.sendRedirect("index.jsp?action_id=view_job&select=true");
                     	}

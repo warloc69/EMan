@@ -34,22 +34,22 @@ public interface IDataAccessor {
 	* return collection contain all departments
 	 * @throws DataAccessException 
 	*/
-	public Collection<IDept> getAllDepts() throws DataAccessException;
+	public Collection<IDept> getAllDepts(String sort) throws DataAccessException;
 	/**
 	* return collection contain all jobs
 	 * @throws DataAccessException 
 	*/
-	public Collection<IJob> getAllJobs() throws DataAccessException;
+	public Collection<IJob> getAllJobs(String sort) throws DataAccessException;
 	/**
 	* return collection contain all offices
 	 * @throws DataAccessException 
 	*/
-	public Collection<IOffice> getAllOffices() throws DataAccessException;
+	public Collection<IOffice> getAllOffices(String sort) throws DataAccessException;
 	/**
 	* return collection contain all workers
 	 * @throws DataAccessException 
 	*/
-	public Collection<IWorker> getAllWorkers() throws DataAccessException;
+	public Collection<IWorker> getAllWorkers(String sort) throws DataAccessException;
 	/**
     * Method returns department by identifier.
 	 * @throws DataAccessException 
@@ -94,7 +94,7 @@ public interface IDataAccessor {
     * Method returns worker by identifier.
      * @throws DataAccessException 
     */
-	public Collection<IWorker> getWorkersByMgrID(BigInteger id) throws DataAccessException;
+	public Collection<IWorker> getWorkersByMgrID(BigInteger id, String sort) throws DataAccessException;
      /**
 	 * method remove department from data source.
 	 * @param id department's identifier for removing 
