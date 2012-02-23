@@ -1,2 +1,3 @@
-ant war
+ant
+pause
 pause

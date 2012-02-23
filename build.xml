@@ -1,48 +1,23 @@
 <?xml version="1.0"?>
-<project default="build" basedir=".">
-	<property name="name" value="AntBuildJar"/>
-	<property name="src.dir" value="${basedir}/src"/>
-	<property name="build" value="${build}/classes"/>
-	<path id="libs.dir">
-		<fileset dir="lib">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
-	<target name="build" description="build" depends="clear">
-		<mkdir dir="build/eman/web-inf/classes"/>
-		<mkdir dir="build/eman/web-inf/lib"/>
-		<javac srcdir="${src.dir}"
-				destdir="build/eman/web-inf/classes"
-				debug="false"
-				deprecation="true"
-				optimize="true">
-			<classpath refid="libs.dir"/>
-		</javac>
-		<copy todir="build/eman/web-inf/classes">
-			<fileset dir="${src.dir}">
-				<include name="**/*.*"/> 
-				<exclude name="**/*.java"/>
-			</fileset>
-		</copy>
-		<copy todir="build/eman/web-inf/lib">
-			<fileset dir="lib">
-				<include name="**/*.*"/>
-			</fileset>
-		</copy>
-		<copy todir="build/eman/web-inf">
-			<fileset dir=".">
-				<include name="web.xml"/>
-			</fileset>
-		</copy>
-	</target>
-	<target name="war" depends="build">
-		<jar destfile="build/eman.war">
-			<fileset dir="build/eman">
-			<include name="**/*.*"/>
-			</fileset>
-		</jar>
-	</target>
-	<target name="clear" description="clear">
-		<delete dir="build"/>
+<project name="04b.classpath" default="war" >
+	<target name="make.dirs" description="Make some dirs">
+        <mkdir dir="build"/>
+        <mkdir dir="build/class"/>
+    </target>
+	<target name="compile" description="compile java" depends="make.dirs">
+        <javac destdir="build/class" 
+		classpath="lib/log4j-1.2.16.jar;lib/ojdbc14.jar;lib/servlet-api.jar">
+            <src path="src"/>
+        </javac>
+    </target>
+	<target name="war" description="make war" depends="compile">
+		<war destfile="eman.war" webxml="eman/WEB-INF/web.xml">
+			<classes dir="build/class"/>
+			<fileset dir="eman"/>
+			<lib dir="lib">
+				<exclude name="ojdbc14.jar"/>
+				<exclude name="servlet-api.jar"/>
+			</lib>
+		</war>
 	</target>
 </project>
