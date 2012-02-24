@@ -9,9 +9,19 @@
             window.opener.window.document.forms.f1.elements.dept_id.value = id;
         }
     </script>
+    <%if(request.getParameter("select") == null)  { %>
+    <table border="0">
+        <tr>
+               <th><a href="index.jsp">Workers</a></th>
+               <th><a href="index.jsp?action_id=view_job">Jobs</a></th>
+               <th><a href="index.jsp?action_id=view_office">Offices</a></th>
+               <th><a href="index.jsp?action_id=view_dept">Departments</a></th>
+        </tr>
+    </table>
+    <%} %>
     <table border="2">
         <tr>
-            <td></td><td><a href="<%=request.getContextPath()%>/?action_id=view_dept&sort=title"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/?action_id=view_dept&sort=description"><p1>Description</p1></a></td>
+            <td colspan="1"></td><td><a href="<%=request.getContextPath()%>/?action_id=view_dept&sort=title"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/?action_id=view_dept&sort=description"><p1>Description</p1></a></td>
         </tr>
      <%
          Collection<IDept> depts = (Collection<IDept>) session.getAttribute("d_depts");
@@ -50,4 +60,6 @@
     </table>
     <%if(request.getParameter("select") == null)  { %>
     <a href="<%=request.getContextPath()%>/?action_id=edit_dept_add" ><img alt="Add" src="<%=request.getContextPath()%>/resource/add.png" border="0"></a>
-   <%}%>
+    <%} else { %>
+            <img alt="Close" src="<%=request.getContextPath()%>/resource/close.png" border="0" onclick="window.close()" />
+        <%} %>

@@ -17,7 +17,12 @@ public class EditWorkerActionProcessor implements ActionProcessor {
     	if("edit_worker_add".equals(req.getParameter("action_id"))) {   
     		if(req.getParameter("lname") == null) {
     			try {
-					resp.sendRedirect("editworker.jsp?action_id=edit_worker_add");
+    				log.info("edit add id: "+req.getParameter("id"));
+    				if(!"null".equals(req.getParameter("id"))){
+	    				IWorker wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
+						req.getSession().setAttribute("e_wor", wor);
+    				}
+    				resp.sendRedirect("editworker.jsp?action_id=edit_worker_add");
 				} catch (IOException e) {
 					log.error("can't redirect on the editjob.jsp",e);
 				}
@@ -37,8 +42,8 @@ public class EditWorkerActionProcessor implements ActionProcessor {
                     worker.setSalegrade(Double.parseDouble(req.getParameter("sal")));
                     access.addWorker(worker);
                     try {
-                    	if (req.getParameter("id") != null) {
-                    		resp.sendRedirect("index.jsp?action_id=view_worker&id=" + req.getParameter("id"));
+                    	if (req.getParameter("mgr_id") != null) {
+                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("mgr_id"));
                     	} else {
                     		resp.sendRedirect("index.jsp");
                     	}
@@ -94,15 +99,21 @@ public class EditWorkerActionProcessor implements ActionProcessor {
 	                } 
         		}
     	 } else if ("edit_worker_remove".equals(req.getParameter("action_id")))  {
-             try {
-                    access.removeWorker(new BigInteger(req.getParameter("id")));
+             try {	
+            	 	BigInteger mgr_id = access.getWorkerByID(new BigInteger(req.getParameter("id"))).getManagerID();
+                   access.removeWorker(new BigInteger(req.getParameter("id")));
                     try {
-                        resp.sendRedirect("index.jsp");
+                    	log.info("remove: ");
+                        resp.sendRedirect("index.jsp?action_id=view_top_manager&id="+mgr_id);
                     } catch (IOException e) {
                         log.error("can't redirect on the showworkers.jsp",e);
                     }
                 } catch (DataAccessException e) {
-                    log.error("can't gets data from IDataAccessor",e);
+                	try {
+						resp.sendRedirect("error.jsp?error_id="+e.getMessage()+e.getCause());
+					} catch (IOException e1) {
+						log.error("can't redirect on the showworkr.jsp",e);
+					}
                 }
                         
         } 

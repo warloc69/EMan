@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Edit worker</title>
 <style type="text/css">
      body {
         background-color: #888888;
@@ -92,10 +92,40 @@
     windowFeatures += "top=" + winTop;
     newWindow = window.open(winUrl, "myWindow", windowFeatures);
   }
+ function validate() {
+	 if (window.document.forms.f1.elements.fname.value == "") {
+		 alert("Write first name");
+		 return false;
+	 }
+	 if (window.document.forms.f1.elements.lname.value == "") {
+         alert("Write last name");
+         return false;
+     }
+	 if (window.document.forms.f1.elements.job_id.value == "") {
+         alert("Choose job");
+         return false;
+     }
+	 if (window.document.forms.f1.elements.office_id.value == "") {
+         alert("Choose office");
+         return false;
+     }
+	 if (window.document.forms.f1.elements.dept_id.value == "") {
+         alert("Choose department");
+         return false;
+     }
+	 if (window.document.forms.f1.elements.sal.value == "") {
+         alert("Write salegrad");
+         return false;
+     }
+	 return true;
+ }
+ function clear() {
+	 window.document.forms.f1.elements.mgr_id.value = "null";
+	 window.document.forms.f1.elements.man.value = " ";
+ }
  </script>
-
     <table>
-        <form name="f1" action="<%=request.getContextPath()%>/" method="post">  
+        <form name="f1" action="<%=request.getContextPath()%>/" method="post" onSubmit="return validate()">  
             <%
             IWorker work = (IWorker) request.getSession().getAttribute("e_worker");
             HashMap<String,String> info = (HashMap<String,String>) request.getSession().getAttribute("info");
@@ -116,7 +146,9 @@
                <tr>
                <td><p1>Manager:</p1></td>
                <td>
-               <input type="text" name="man"  onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)" readonly value="<%= work.getManagerID() != null ? info.get("mgr_id") : "manager"  %> "/>
+               <input type="text" name="man" readonly value="<%= work.getManagerID() != null ? info.get("mgr_id") : " "  %> "/>
+               <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
+               <a onclick="clear()">&nbsp;-&nbsp;</a>
                <input type="hidden" name="mgr_id" value="<%=work.getManagerID() %>" /> 
                 </td>
                 </tr> 
@@ -147,6 +179,7 @@
               </tr>
              <%
                 } else {
+                	IWorker wor = (IWorker) request.getSession().getAttribute("e_wor");
              %>
             <tr> 
                 <td><p1>First Name:</p1></td>
@@ -161,29 +194,37 @@
                  <tr>
                <td><p1>Manager:</p1></td>
                <td>
-	               <input type="text" name="man"  onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)" readonly value="manager"/>
-	               <input type="hidden" name="mgr_id" value=1 />
+                <% if(wor != null) { %>
+	               <input type="text" name="man"  readonly value="<%=wor.getLastName() %>" />
+	               <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
+	               <a onclick="clear()">&nbsp;-&nbsp;</a>
+	               <input type="hidden" name="mgr_id" value="<%=wor.getID() %>" />
+	               <%} else { %>
+		               <input type="text" name="man"  readonly value="" />
+	                   <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
+	                   <input type="hidden" name="mgr_id" value="null" />
+                   <%} %>
                 </td>
                 </tr> 
                  <tr>
                <td><p1>Job:</p1></td>
                <td>
                 <input type="text" name="job"  onclick="butOpenWin_onclick('index.jsp?action_id=view_job&select=true', 650, 450)" readonly value="job"/>
-                <input type="hidden" name="job_id" value=1 />
+                <input type="hidden" name="job_id" />
                 </td>
                 </tr>   
                  <tr>
                <td><p1>Offices:</p1></td>
                <td>
                 <input type="text" name="office"  onclick="butOpenWin_onclick('index.jsp?action_id=view_office&select=true', 650, 450)" readonly value="office"/>
-                <input type="hidden" name="office_id" value=1 />
+                <input type="hidden" name="office_id" />
                 </td>
                 </tr>   
                  <tr>
                <td><p1>Department:</p1></td>
                <td>
                 <input type="text" name="dept"  onclick="butOpenWin_onclick('index.jsp?action_id=view_dept&select=true', 650, 450)" readonly value="dept"/>
-                <input type="hidden" name="dept_id" value=1 />
+                <input type="hidden" name="dept_id" />
                 </td>
                 </tr> 
                 <tr> 

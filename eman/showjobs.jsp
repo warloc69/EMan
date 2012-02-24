@@ -8,6 +8,16 @@
             window.opener.window.document.forms.f1.elements.job_id.value = id;
         }
     </script>
+    <%if(request.getParameter("select") == null)  { %>
+    <table border="0">
+        <tr>
+               <th><a href="index.jsp">Workers</a></th>
+               <th><a href="index.jsp?action_id=view_job">Jobs</a></th>
+               <th><a href="index.jsp?action_id=view_office">Offices</a></th>
+               <th><a href="index.jsp?action_id=view_dept">Departments</a></th>
+        </tr>
+    </table>
+    <%} %>
     <table border="2">
         <tr>
                <td></td><td><a href="<%=request.getContextPath()%>/?action_id=view_job&sort=title"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/?action_id=view_job&sort=description"><p1>Description</p1></a></td>
@@ -50,4 +60,6 @@
     </table>
     <%if(request.getParameter("select") == null)  { %>
     <a href="<%=request.getContextPath()%>/?action_id=edit_job_add"><img alt="Add" src="<%=request.getContextPath()%>/resource/add.png" border="0"></a>
-    <%}%>
+     <%} else { %>
+            <img alt="Close" src="<%=request.getContextPath()%>/resource/close.png" border="0" onclick="window.close()" />
+        <%} %>

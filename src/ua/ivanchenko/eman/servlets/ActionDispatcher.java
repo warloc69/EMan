@@ -33,16 +33,19 @@ public class ActionDispatcher extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action_id");
-        if((request.getParameter("id") != null) && "null".equals(request.getParameter("id"))) {
-        	response.sendRedirect("index.jsp");
-        	return;
+        if (!"edit_worker_add".equals(action) ) {
+	        if((request.getParameter("id") != null) && "null".equals(request.getParameter("id"))) {
+	        	log.info("redirect from do get");
+	        	response.sendRedirect("index.jsp");
+	        	return;
+	        }
         }
         try {
 			IConfig config = (IConfig) getServletContext().getAttribute("config_class");
 			IDataAccessor accessor = DataAccessor.getInstance(config);
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
 			ActionProcessor proc = apf.getProcessor(action,config);
-			log.info("doGet{action_id:"+action+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"}");
+			log.info("doGet{action_id:"+action+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
 			proc.process(request, response, accessor);
 		} catch (CreateProcessorException e) {
 			log.error("can't create the processor ", e);

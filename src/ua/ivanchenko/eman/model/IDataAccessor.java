@@ -143,5 +143,6 @@ public interface IDataAccessor {
 	 * @throws DataAccessException if got data source error.
 	 */
 	public void updateWorker(IWorker worker) throws DataAccessException;
+    public Collection<IWorker> getPath(BigInteger id) throws DataAccessException;
 
 }

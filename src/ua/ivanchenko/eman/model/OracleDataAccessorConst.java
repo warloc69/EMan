@@ -16,6 +16,7 @@ public class OracleDataAccessorConst {
     public static final String REMOVE_OFFICE = "DELETE FROM OFFICES WHERE ID=?";
     public static final String UPDATE_OFFICE = "UPDATE OFFICES SET TITLE=?,ADDRESS=?,MANAGER=? WHERE ID=?";
     //worker
+    public static final String GET_PATH = "select ID,LASTNAME from employees connect by id = prior mgrid start with id = ? order by level desc";
     public static final String GET_ALL_TOPMANAGER = "SELECT ID,FIRSTNAME,LASTNAME,MGRID,DEPARTMENT_ID,JOB_ID,OFFICE_ID,SALEGRADE FROM EMPLOYEES WHERE MGRID IS NULL";
     public static final String ADD_WORKER = "INSERT INTO EMPLOYEES(ID,FIRSTNAME,LASTNAME,MGRID,DEPARTMENT_ID,JOB_ID,OFFICE_ID,SALEGRADE) VALUES(getid(),?,?,?,?,?,?,?)";
     public static final String GET_ALL_WORKERS = "SELECT ID,FIRSTNAME,LASTNAME,MGRID,DEPARTMENT_ID,JOB_ID,OFFICE_ID,SALEGRADE FROM EMPLOYEES";
@@ -32,4 +33,5 @@ public class OracleDataAccessorConst {
     public static final String REMOVE_JOB = "DELETE FROM JOBS WHERE ID=?";
     public static final String UPDATE_JOB = "UPDATE JOBS SET TITLE=?,DESCRIPTION=? WHERE ID=?";
     public static final String DATA_SOURCE = "java:comp/env/jdbc/eman_oracle";
+    
 }

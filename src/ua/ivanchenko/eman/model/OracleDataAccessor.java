@@ -893,4 +893,27 @@ public final class OracleDataAccessor  implements IDataAccessor {
             resClean(connection,prep,null);
         }
     }
+    public Collection<IWorker> getPath(BigInteger id) throws DataAccessException {
+    	 PreparedStatement prep = null;
+         Connection connection = null;
+         try {
+             connection = getConnection();
+             prep = connection.prepareStatement(OracleDataAccessorConst.GET_PATH);
+             prep.setBigDecimal(1, new BigDecimal(id));
+             ResultSet rset = prep.executeQuery();
+             LinkedList<IWorker> ls = new LinkedList<IWorker>();
+             while (rset.next()) {
+                 IWorker worker = new Worker();
+                 worker.setID(rset.getBigDecimal(1).toBigInteger());
+                 worker.setLastName(rset.getString(2));
+                 ls.add(worker);
+             }
+             return ls;
+         } catch (SQLException e) {
+             log.error("Get worker by mgr id sql error",e);
+             throw new DataAccessException("Get worker by mgr id sql error",e);
+         } finally {
+             resClean(connection,prep,null);
+         }
+    }
 }

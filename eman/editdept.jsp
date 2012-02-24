@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Edit department</title>
 <style type="text/css">
      body {
         background-color: #888888;
@@ -78,8 +78,21 @@
     </style>
 </head>
 <body>
+<script language="JavaScript" type="text/javascript">
+ function validate() {
+     if (window.document.forms.f1.elements.title.value == "") {
+         alert("Write title name");
+         return false;
+     }
+     if (window.document.forms.f1.elements.desc.value == "") {
+         alert("Write description name");
+         return false;
+     }
+     return true;
+ }
+ </script>
     <table>
-        <form action="<%=request.getContextPath()%>/" method="post">
+        <form  name="f1" action="<%=request.getContextPath()%>/" method="post" onSubmit="return validate()" >
             <%
             IDept dept = (IDept) request.getSession().getAttribute("e_dept");
             if("edit_dept_update".equals(request.getParameter("action_id")))

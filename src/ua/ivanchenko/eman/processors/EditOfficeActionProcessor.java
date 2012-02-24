@@ -92,7 +92,11 @@ public class EditOfficeActionProcessor implements ActionProcessor {
                         log.error("can't redirect on the showoffices.jsp",e);
                     }
                 } catch (DataAccessException e) {
-                    log.error("can't gets data from IDataAccessor",e);
+                	try {
+						resp.sendRedirect("error.jsp?error_id="+e.getMessage()+e.getCause());
+					} catch (IOException e1) {
+						log.error("can't redirect on the showoffices.jsp",e);
+					}
                 }
                 
                         

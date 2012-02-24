@@ -26,7 +26,13 @@
 	  color: #000000;
     }
     a {
-        color: #00FF0C;
+        color: #000000;
+        text-decoration: none;
+    }
+    a:hover {
+      background: transparent;
+      color: #00FF0C;
+      text-decoration: none;
     }
     thead th, tfoot th {
 	  font: bold 10px helvetica, verdana, arial, sans-serif;
@@ -76,17 +82,8 @@
      }
     
     </style>
-    
 </head>
 <body>
-    <table border="0">
-        <tr>
-               <th><a href="index.jsp">Workers</a></th>
-               <th><a href="index.jsp?action_id=view_job">Jobs</a></th>
-               <th><a href="index.jsp?action_id=view_office">Offices</a></th>
-               <th><a href="index.jsp?action_id=view_dept">Departments</a></th>
-        </tr>
-    </table>
     <% String path_dept = request.getContextPath()+ "/?action_id=view_dept";  %>
     <% String path_job = request.getContextPath()+ "/?action_id=view_job";  %>
     <% String path_office = request.getContextPath()+ "/?action_id=view_office";  %>
@@ -119,9 +116,10 @@
 	    <%} else {  %>
 	        <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
 	            <jsp:include page="<%= path_manager %>" />
+	        <%}  else if (request.getParameter("id") != null) {%>
+	           <jsp:include page="<%= path_manager %>" />
 	        <%} %>
-	        <%@ include file="showworkers.jsp" %>
-	        
+	        <%@ include file="showworkers.jsp" %>	        
 	    <%} %>
     <%} else { %>
         <%if ("view_dept".equals(request.getParameter("action_id"))) {%>

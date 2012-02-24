@@ -52,8 +52,10 @@ public class ViewDeptActionProcessor implements ActionProcessor {
                     try {
                     	if (req.getParameter("select") == null) {
                     		if(req.getParameter("sort") == null) {
+                    			log.error("index.jsp?action_id=view_dept");
                     			resp.sendRedirect("index.jsp?action_id=view_dept");
                     		} else {
+                    			log.error("index.jsp?action_id=view_dept&sort="+req.getParameter("sort"));
                     			resp.sendRedirect("index.jsp?action_id=view_dept&sort="+req.getParameter("sort"));
                     		}
                     	} else {

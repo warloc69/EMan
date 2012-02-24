@@ -64,25 +64,31 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 } return;
             } else if("view_top_manager".equals(req.getParameter("action_id"))) {
                 try {
-                	log.info(" td ViewWorkerActionPorcessor get mgr_id { id:"+req.getParameter("id")+"}");
+                	log.info(" td ViewWorkerActionPorcessor get id { id:"+req.getParameter("id")+"} query string :" + req.getQueryString());
                 	Collection<IWorker> workers = null;
                 	Collection<IWorker> allworkers = null;
                 	if (req.getParameter("sort") != null) {
+                		log.info(" td ViewWorkerActionPorcessor get mgr_id sort");
                 		allworkers  = access.getAllWorkers(req.getParameter("sort"));
                 	} else {
+                		log.info(" td ViewWorkerActionPorcessor get mgr_id not sort");
                 		allworkers  = access.getAllWorkers(null);
                 	}
                 	IWorker wor = null;
                 	if (req.getParameter("id") != null) {
+                			log.info("id === "+req.getParameter("id"));
+                			req.getSession().setAttribute("path", access.getPath(new BigInteger(req.getParameter("id"))));
                 			wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
                 	}
                 	if (req.getParameter("id") == null) {
                 		workers = access.getTopManagers();
                 	} else {
-                		if (req.getParameter("sort") == null) {
+                		if (req.getParameter("sort") == null) {                			
                 			workers = access.getWorkersByMgrID(new BigInteger(req.getParameter("id")),null);
+                			log.info("ViewWorkerActionPorcessor get all worker {not sorted :" + workers+"}");
                 		} else {
                 			workers = access.getWorkersByMgrID(new BigInteger(req.getParameter("id")),req.getParameter("sort"));
+                			log.info("ViewWorkerActionPorcessor get all worker {sorted :" + workers+"}");
                 		}
                 	}
                     HashMap<BigInteger,String> deptsname = new  HashMap<BigInteger,String>();
@@ -110,7 +116,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                     req.getSession().setAttribute("w_departments", deptsname);
                     req.getSession().setAttribute("w_offices",officesname);
                     req.getSession().setAttribute("w_jobs", jobsname);
-                    log.info("ViewWorkerActionPorcessor get all worker {managersname :" + managersname+"}");
+                    
                     req.getSession().setAttribute("w_manager",managersname);
                     try {
                     	if (req.getParameter("tab") == null){
@@ -120,8 +126,13 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
 	                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
 	                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
 	                    		} else {
-	                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
-	                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
+	                    			if (req.getParameter("id") != null){
+		                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
+		                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
+	                    			} else {
+	                    				log.info("1 redirect to index.jsp?action_id=view_top_manager"+"&sort="+req.getParameter("sort"));
+		                    			resp.sendRedirect("index.jsp?action_id=view_top_manager"+"&sort="+req.getParameter("sort"));
+	                    			}
 	                    		}
 	                    	} else {
 	                    		log.info("redirect to index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));

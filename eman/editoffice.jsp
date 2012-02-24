@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Edit office </title>
 <style type="text/css">
      body {
         background-color: #888888;
@@ -91,9 +91,20 @@
     windowFeatures += "top=" + winTop;
     newWindow = window.open(winUrl, "myWindow", windowFeatures);
   }
+ function validate() {
+     if (window.document.forms.f1.elements.title.value == "") {
+         alert("Write titlename");
+         return false;
+     }
+     if (window.document.forms.f1.elements.adr.value == "") {
+         alert("Write addres name");
+         return false;
+     }
+     return true;
+ }
  </script>
     <table>
-        <form name="f1" action="<%=request.getContextPath()%>/" method="post">
+        <form name="f1" action="<%=request.getContextPath()%>/" method="post" onSubmit="return validate()">
             <%
             HashMap<String,String> info = (HashMap<String,String>) request.getSession().getAttribute("info");
             IOffice office = (IOffice) request.getSession().getAttribute("e_office");
@@ -114,7 +125,8 @@
                <tr>
                <td><p1>Manager:</p1></td>
                <td>
-	                <input type="text" name="man"  onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)" readonly value="<%= office.getManagerID() != null ? info.get("mgr_id") : "manager"  %>"/>
+	                <input type="text" name="man"  readonly value="<%= office.getManagerID() != null ? info.get("mgr_id") : " "  %>"/>
+	                <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
 	                <input type="hidden" name="mgr_id" value=<%=office.getManagerID() != null ? office.getManagerID() : "null" %> />
                 </td>
                 </tr>   
@@ -133,8 +145,9 @@
                 <tr>
                <td><p1>Manager:</p1></td>
                <td>
-                    <input type="text" name="man"  onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)" readonly value="manager"/>
-                    <input type="hidden" name="mgr_id" value=1 />
+                    <input type="text" name="man"  readonly value=" "/>
+                    <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                    <input type="hidden" name="mgr_id" value=null />
                 </td>
                 </tr>
              <%
