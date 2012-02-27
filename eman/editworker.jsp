@@ -119,9 +119,21 @@
      }
 	 return true;
  }
- function clear() {
+ function clearman() {
 	 window.document.forms.f1.elements.mgr_id.value = "null";
 	 window.document.forms.f1.elements.man.value = " ";
+ }
+ function clearjob() {
+     window.document.forms.f1.elements.job_id.value = "null";
+     window.document.forms.f1.elements.job.value = " ";
+ }
+ function cleardept() {
+     window.document.forms.f1.elements.dept_id.value = "null";
+     window.document.forms.f1.elements.dept.value = " ";
+ }
+ function clearoffice() {
+     window.document.forms.f1.elements.office_id.value = "null";
+     window.document.forms.f1.elements.office.value = " ";
  }
  </script>
     <table>
@@ -148,28 +160,34 @@
                <td>
                <input type="text" name="man" readonly value="<%= work.getManagerID() != null ? info.get("mgr_id") : " "  %> "/>
                <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
-               <a onclick="clear()">&nbsp;-&nbsp;</a>
+               <a onclick="clearman()">&nbsp;-&nbsp;</a>
                <input type="hidden" name="mgr_id" value="<%=work.getManagerID() %>" /> 
                 </td>
                 </tr> 
                  <tr>
                <td><p1>Job:</p1></td>
                <td>
-                <input type="text" name="job"  onclick="butOpenWin_onclick('index.jsp?action_id=view_job&select=true', 650, 450)" readonly value="<%= info.get("job_id") %>"/>
+                <input type="text" name="job"   readonly value="<%= info.get("job_id") %>"/>
+                <a onclick="butOpenWin_onclick('index.jsp?action_id=view_job&select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                <a onclick="clearjob()">&nbsp;-&nbsp;</a>
                 <input type="hidden" name="job_id" value="<%=work.getJobID() %>" />
                 </td>
                 </tr>   
                  <tr>
                <td><p1>Offices:</p1></td>
                <td>
-                <input type="text" name="office"  onclick="butOpenWin_onclick('index.jsp?action_id=view_office&select=true', 650, 450)" readonly value="<%= info.get("office_id") %>"/>
+                <input type="text" name="office"   readonly value="<%= info.get("office_id") %>"/>
+                <a onclick="butOpenWin_onclick('index.jsp?action_id=view_office&select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                <a onclick="clearoffice()">&nbsp;-&nbsp;</a>
                 <input type="hidden" name="office_id" value="<%=work.getOfficeID()%>" />
                 </td>
                 </tr>   
                  <tr>
                <td><p1>Department:</p1></td>
                <td>
-                <input type="text" name="dept"  onclick="butOpenWin_onclick('index.jsp?action_id=view_dept&select=true', 650, 450)" readonly value="<%= info.get("dept_id") %>"/>
+                <input type="text" name="dept"   readonly value="<%= info.get("dept_id") %>"/>
+                 <a onclick="butOpenWin_onclick('index.jsp?action_id=view_dept&select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                <a onclick="cleardept()">&nbsp; - &nbsp;</a>
                 <input type="hidden" name="dept_id" value="<%=work.getDepartmentID() %>" />
                 </td>
                 </tr>   
@@ -197,11 +215,12 @@
                 <% if(wor != null) { %>
 	               <input type="text" name="man"  readonly value="<%=wor.getLastName() %>" />
 	               <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
-	               <a onclick="clear()">&nbsp;-&nbsp;</a>
+	               <a onclick="clearman()">&nbsp; - &nbsp;</a>
 	               <input type="hidden" name="mgr_id" value="<%=wor.getID() %>" />
 	               <%} else { %>
 		               <input type="text" name="man"  readonly value="" />
 	                   <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
+	                   <a onclick="clearman()">&nbsp; - &nbsp;</a>
 	                   <input type="hidden" name="mgr_id" value="null" />
                    <%} %>
                 </td>
@@ -209,21 +228,27 @@
                  <tr>
                <td><p1>Job:</p1></td>
                <td>
-                <input type="text" name="job"  onclick="butOpenWin_onclick('index.jsp?action_id=view_job&select=true', 650, 450)" readonly value="job"/>
+                <input type="text" name="job" readonly />
+                 <a onclick="butOpenWin_onclick('index.jsp?action_id=view_job&select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                <a onclick="clearjob()">&nbsp;-&nbsp;</a>
                 <input type="hidden" name="job_id" />
                 </td>
                 </tr>   
                  <tr>
                <td><p1>Offices:</p1></td>
                <td>
-                <input type="text" name="office"  onclick="butOpenWin_onclick('index.jsp?action_id=view_office&select=true', 650, 450)" readonly value="office"/>
+                <input type="text" name="office" readonly />
+                 <a onclick="butOpenWin_onclick('index.jsp?action_id=view_office&select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                <a onclick="clearoffice()">&nbsp;-&nbsp;</a>
                 <input type="hidden" name="office_id" />
                 </td>
                 </tr>   
                  <tr>
                <td><p1>Department:</p1></td>
                <td>
-                <input type="text" name="dept"  onclick="butOpenWin_onclick('index.jsp?action_id=view_dept&select=true', 650, 450)" readonly value="dept"/>
+                <input type="text" name="dept" readonly />
+                <a onclick="butOpenWin_onclick('index.jsp?action_id=view_dept&select=true', 650, 450)">&nbsp;+&nbsp;</a>
+                <a onclick="cleardept()">&nbsp; - &nbsp;</a>
                 <input type="hidden" name="dept_id" />
                 </td>
                 </tr> 

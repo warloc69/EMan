@@ -76,5 +76,6 @@ public interface IWorker {
      * @param sale is worker's salegrade.
      */
     public void setSalegrade(double sale);
-
+    @Override
+	public int hashCode();
 }

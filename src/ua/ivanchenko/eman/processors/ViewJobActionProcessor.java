@@ -57,7 +57,11 @@ public class ViewJobActionProcessor implements ActionProcessor {
                     			resp.sendRedirect("index.jsp?action_id=view_job&sort="+req.getParameter("sort"));
                     		}
                     	} else {
-                    		resp.sendRedirect("index.jsp?action_id=view_job&select=true");
+                    		if(req.getParameter("sort") == null) {
+                    			resp.sendRedirect("index.jsp?action_id=view_job&select=true");
+                    		} else {
+                    			resp.sendRedirect("index.jsp?action_id=view_job&select=true&sort="+req.getParameter("sort"));
+                    		}
                     	}
                     } catch (IOException e) {
                         log.error("can't redirect on the showjobs.jsp",e);

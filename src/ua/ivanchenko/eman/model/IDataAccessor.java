@@ -29,7 +29,7 @@ public interface IDataAccessor {
 	 * @throws DataAccessException if got data source error.
 	 */
 	public void addWorker(IWorker worker) throws DataAccessException;
-	public Collection<IWorker> getTopManagers() throws DataAccessException;
+	public Collection<IWorker> getTopManagers(String sort) throws DataAccessException;
 	/**
 	* return collection contain all departments
 	 * @throws DataAccessException 
@@ -89,7 +89,7 @@ public interface IDataAccessor {
     * Method returns worker by last name.
      * @throws DataAccessException 
     */
-	public Collection<IWorker> getWorkersByLastName(String lname) throws DataAccessException;
+	public Collection<IWorker> getWorkersByName(String lname) throws DataAccessException;
     /**
     * Method returns worker by identifier.
      * @throws DataAccessException 
@@ -144,5 +144,6 @@ public interface IDataAccessor {
 	 */
 	public void updateWorker(IWorker worker) throws DataAccessException;
     public Collection<IWorker> getPath(BigInteger id) throws DataAccessException;
+    public Collection<IWorker> getWorkerByJobID(BigInteger id) throws DataAccessException;
 
 }

@@ -48,20 +48,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                 } return;
-         } else if (req.getParameter("last_name") != null) {
-                try {
-                	log.info("ViewWorkerActionPorcessor get last_name {last_name:"+req.getParameter("last_name")+"}");
-                    Collection<IWorker> workers = access.getWorkersByLastName(req.getParameter("last_name"));
-                    req.setAttribute("w_workers", workers);
-                    try {
-                    	log.info("redirect to showworkers.jsp");
-                        resp.sendRedirect("showworkers.jsp");
-                    } catch (IOException e) {
-                        log.error("can't redirect on the showworkers.jsp",e);
-                    }
-                } catch (DataAccessException e) {
-                    log.error("can't gets data from IDataAccessor",e);
-                } return;
+        
             } else if("view_top_manager".equals(req.getParameter("action_id"))) {
                 try {
                 	log.info(" td ViewWorkerActionPorcessor get id { id:"+req.getParameter("id")+"} query string :" + req.getQueryString());
@@ -81,7 +68,11 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 			wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
                 	}
                 	if (req.getParameter("id") == null) {
-                		workers = access.getTopManagers();
+                		if (req.getParameter("sort") == null) {  
+                			workers = access.getTopManagers(null);
+                		} else {
+                			workers = access.getTopManagers(req.getParameter("sort"));
+                		}
                 	} else {
                 		if (req.getParameter("sort") == null) {                			
                 			workers = access.getWorkersByMgrID(new BigInteger(req.getParameter("id")),null);
@@ -115,16 +106,20 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                     req.getSession().setAttribute("w_workers", workers);
                     req.getSession().setAttribute("w_departments", deptsname);
                     req.getSession().setAttribute("w_offices",officesname);
-                    req.getSession().setAttribute("w_jobs", jobsname);
-                    
+                    req.getSession().setAttribute("w_jobs", jobsname);                    
                     req.getSession().setAttribute("w_manager",managersname);
                     try {
                     	if (req.getParameter("tab") == null){
 	                    	
 	                    	if (req.getParameter("select") == null) {
 	                    		if(req.getParameter("sort") == null) {
-	                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
-	                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
+	                    			if (req.getParameter("id") != null){
+		                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
+		                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("id"));
+	                    			} else {
+	                    				log.info("redirect to index.jsp?action_id=view_top_manager");
+		                    			resp.sendRedirect("index.jsp?action_id=view_top_manager");
+	                    			}
 	                    		} else {
 	                    			if (req.getParameter("id") != null){
 		                    			log.info("redirect to index.jsp?action_id=view_top_manager&id=" + req.getParameter("id")+"&sort="+req.getParameter("sort"));
@@ -135,8 +130,13 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
 	                    			}
 	                    		}
 	                    	} else {
-	                    		log.info("redirect to index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));
-	                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));
+	                    		if ( req.getParameter("id") != null) {
+		                    		log.info("redirect to index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));
+		                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&select=true&id=" + req.getParameter("id"));
+	                    		} else {
+	                    			log.info("redirect to index.jsp?action_id=view_top_manager&select=true");
+		                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&select=true");
+	                    		}
 	                    	}
                     	} else {
                     		log.info("redirect to index.jsp?action_id=view_top_manager&tab=details&id=" + req.getParameter("id"));
@@ -148,7 +148,26 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                 } return;
-            } else {
+            } else if ("search".equals(req.getParameter("action_id"))) {
+                    try {
+                    	log.info("ViewWorkerActionPorcessor get id {last_name:"+req.getParameter("id")+"}");
+                        Collection<IWorker> workers = access.getWorkersByName(req.getParameter("id"));
+                        req.getSession().setAttribute("w_workers", workers);
+                        log.info("workers : "+ workers );
+                        try {
+                        	log.info("redirect to showworkers.jsp");
+                        	if (req.getParameter("select")== null ) {
+                        		resp.sendRedirect("index.jsp?action_id=search&id="+req.getParameter("id"));
+                        	} else {
+                        		resp.sendRedirect("index.jsp?action_id=search&select=true&id="+req.getParameter("id"));
+                        	}
+                        } catch (IOException e) {
+                            log.error("can't redirect on the showworkers.jsp",e);
+                        }
+                    } catch (DataAccessException e) {
+                        log.error("can't gets data from IDataAccessor",e);
+                    } return;
+    		} else {
                 try {
                 	log.info("ViewWorkerActionPorcessor get all worker");
                 	Collection<IWorker> workers  = null;
@@ -157,7 +176,6 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 	} else {
                 		workers  = access.getAllWorkers(null);
                 	}
-
                 	HashMap<BigInteger,String> deptsname = new  HashMap<BigInteger,String>();
                 	HashSet<IWorker> managersname = new  HashSet<IWorker>();
                 	HashMap<BigInteger,String> officesname = new  HashMap<BigInteger,String>();
@@ -201,5 +219,4 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 } 
             }  
     }
-
 }

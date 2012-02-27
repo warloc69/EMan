@@ -1,5 +1,4 @@
 package ua.ivanchenko.eman.processors;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import javax.servlet.http.HttpServletRequest;
@@ -10,8 +9,6 @@ import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IJob;
 import ua.ivanchenko.eman.model.Job;
-
-
 public class EditJobActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
@@ -66,7 +63,12 @@ public class EditJobActionProcessor implements ActionProcessor {
             		}
             } else if ("edit_job_remove".equals(req.getParameter("action_id")))  {
                 try {
-                    access.removeJob(new BigInteger(req.getParameter("id")));
+                	log.info("remove job: size ="+ access.getWorkerByJobID(new BigInteger(req.getParameter("id"))).size());
+                	if (access.getWorkerByJobID(new BigInteger(req.getParameter("id"))).size() == 0 ) {
+                		access.removeJob(new BigInteger(req.getParameter("id")));
+                	} else {
+                		throw new DataAccessException("Cannot remove job becose job is use");
+                	}
                     try {
                         resp.sendRedirect("index.jsp?action_id=view_job");
                     } catch (IOException e) {
@@ -75,12 +77,11 @@ public class EditJobActionProcessor implements ActionProcessor {
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                     try {
-						resp.sendRedirect("error.jsp?error_id="+e.getMessage()+e.getCause());
+						resp.sendRedirect("error.jsp?error_id="+e.getMessage());
 					} catch (IOException e1) {
 						log.error("can't redirect on the showjobs.jsp",e);
 					}
                 }
-            }              
+            }
     }
-
 }

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import javax.naming.Context;
@@ -557,7 +558,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * Method returns worker by last name.
     * @throws DataAccessException if got data source error.
     */
-    public Collection<IWorker> getWorkersByLastName(String lname) throws DataAccessException {
+    public Collection<IWorker> getWorkersByName(String lname) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         try {
@@ -565,13 +566,36 @@ public final class OracleDataAccessor  implements IDataAccessor {
             prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_LAST_NAME);
             prep.setString(1, lname);
             ResultSet rset = prep.executeQuery();
-            LinkedList<IWorker> ls = new LinkedList<IWorker>();
+            HashSet<IWorker> ls = new HashSet<IWorker>();
             while (rset.next()) {
                 IWorker worker = new Worker();
                 worker.setID(rset.getBigDecimal(1).toBigInteger());
                 worker.setFirstName(rset.getString(2));
                 worker.setLastName(rset.getString(3));
-                worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                if (rset.getBigDecimal(4) != null){
+                	worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                } else {
+                	worker.setManagerID(null);
+                }
+                worker.setDepartmentID(rset.getBigDecimal(5).toBigInteger());
+                worker.setJobID(rset.getBigDecimal(6).toBigInteger());
+                worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
+                worker.setSalegrade(rset.getDouble(8));
+                ls.add(worker);
+            }
+            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_FIRST_NAME);
+            prep.setString(1, lname);
+            rset = prep.executeQuery();
+            while (rset.next()) {
+                IWorker worker = new Worker();
+                worker.setID(rset.getBigDecimal(1).toBigInteger());
+                worker.setFirstName(rset.getString(2));
+                worker.setLastName(rset.getString(3));
+                if (rset.getBigDecimal(4) != null){
+                	worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
+                } else {
+                	worker.setManagerID(null);
+                }
                 worker.setDepartmentID(rset.getBigDecimal(5).toBigInteger());
                 worker.setJobID(rset.getBigDecimal(6).toBigInteger());
                 worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
@@ -624,12 +648,17 @@ public final class OracleDataAccessor  implements IDataAccessor {
             resClean(connection,prep,null);
         }
     }
-    public Collection<IWorker> getTopManagers() throws DataAccessException {
+    public Collection<IWorker> getTopManagers(String sort) throws DataAccessException {
         PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_TOPMANAGER);
+            if (sort == null) {
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_TOPMANAGER);
+            } else {
+            	log.info("sql : "+ OracleDataAccessorConst.GET_ALL_TOPMANAGER+" order by "+sort);
+            	prep = connection.prepareStatement(OracleDataAccessorConst.GET_ALL_TOPMANAGER+" order by "+sort);
+            }
             ResultSet rset = prep.executeQuery();
             LinkedList<IWorker> ls = new LinkedList<IWorker>();
             while (rset.next()) {
@@ -916,4 +945,27 @@ public final class OracleDataAccessor  implements IDataAccessor {
              resClean(connection,prep,null);
          }
     }
+    public Collection<IWorker> getWorkerByJobID(BigInteger id) throws DataAccessException {
+   	 	PreparedStatement prep = null;
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID);
+            prep.setBigDecimal(1, new BigDecimal(id));
+            ResultSet rset = prep.executeQuery();
+            LinkedList<IWorker> ls = new LinkedList<IWorker>();
+            while (rset.next()) {
+                IWorker worker = new Worker();
+                worker.setID(rset.getBigDecimal(1).toBigInteger());
+                worker.setLastName(rset.getString(2));
+                ls.add(worker);
+            }
+            return ls;
+        } catch (SQLException e) {
+            log.error("Get worker by mgr id sql error",e);
+            throw new DataAccessException("Get worker by mgr id sql error",e);
+        } finally {
+            resClean(connection,prep,null);
+        }
+   }
 }

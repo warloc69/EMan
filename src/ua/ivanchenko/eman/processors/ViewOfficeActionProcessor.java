@@ -78,7 +78,11 @@ public class ViewOfficeActionProcessor implements ActionProcessor {
                     		  resp.sendRedirect("index.jsp?action_id=view_office&sort="+req.getParameter("sort"));
                     	  }
                     	} else {
-                    		resp.sendRedirect("index.jsp?action_id=view_office&select=true");
+                    		if(req.getParameter("sort") == null) {
+                    			resp.sendRedirect("index.jsp?action_id=view_office&select=true");
+                    		} else {
+                    			resp.sendRedirect("index.jsp?action_id=view_office&select=true&sort="+req.getParameter("sort"));
+                    		}
                     	}
                     } catch (IOException e) {
                         log.error("can't redirect on the showoffices.jsp",e);

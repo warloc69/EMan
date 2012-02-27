@@ -80,7 +80,6 @@
     tbody tr:hover {
       background: #888888;
      }
-    
     </style>
 </head>
 <body>
@@ -113,13 +112,17 @@
 			      <jsp:include page="<%= path_worker %>" />
 			   <%} %>  
 			<%@ include file="showworkers.jsp" %> 
-	    <%} else {  %>
-	        <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
-	            <jsp:include page="<%= path_manager %>" />
-	        <%}  else if (request.getParameter("id") != null) {%>
-	           <jsp:include page="<%= path_manager %>" />
-	        <%} %>
-	        <%@ include file="showworkers.jsp" %>	        
+	   <%} else {  %>
+	       <%if (!"search".equals(request.getParameter("action_id"))) {%>
+		        <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
+		            <jsp:include page="<%= path_manager %>" />
+		        <%}  else if (request.getParameter("id") != null) {%>
+		           <jsp:include page="<%= path_manager %>" />
+		        <%} %>		        
+	           <%@ include file="showworkers.jsp" %>
+	       <%} else { %>
+	           <%@ include file="showworkers.jsp" %>
+	       <%} %>
 	    <%} %>
     <%} else { %>
         <%if ("view_dept".equals(request.getParameter("action_id"))) {%>
@@ -137,10 +140,15 @@
                <%} %>  
             <%@ include file="showworkers.jsp" %> 
         <%} else {  %>
-            <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
-                <jsp:include page="<%= path_manager + \"&select=true\"%>" />
-            <%} %>
-            <%@ include file="showworkers.jsp" %>
-        <%} }%>
+            <%if (!"search".equals(request.getParameter("action_id"))) {%>
+	            <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
+	                <jsp:include page="<%= path_manager + \"&select=true\"%>" />
+	            <%} %>
+	            <%@ include file="showworkers.jsp" %>
+	        <%} else { %>
+               <%@ include file="showworkers.jsp" %>
+           <%} %>
+        <%} 
+     }%>
 </body>
 </html>

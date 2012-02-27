@@ -59,7 +59,11 @@ public class ViewDeptActionProcessor implements ActionProcessor {
                     			resp.sendRedirect("index.jsp?action_id=view_dept&sort="+req.getParameter("sort"));
                     		}
                     	} else {
-                    		resp.sendRedirect("index.jsp?action_id=view_dept&select=true");
+                    		if(req.getParameter("sort") == null) {
+                    			resp.sendRedirect("index.jsp?action_id=view_dept&select=true");
+                    		} else {
+                    			resp.sendRedirect("index.jsp?action_id=view_dept&select=true&sort="+req.getParameter("sort"));
+                    		}
                     	}
                     } catch (IOException e) {
                         log.error("can't redirect on the showdepts.jsp",e);
