@@ -13,6 +13,13 @@ import ua.ivanchenko.eman.model.IOffice;
 import ua.ivanchenko.eman.model.IWorker;
 public class ViewOfficeActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
+	/**
+     * method processes the request from user and generate response with offices list
+     * @param req it's request
+     * @param resp it's response
+     * @throws ConfigLoaderException  when got incorrect configs file.
+     * @throws DataAccessException when can't access to data.
+     */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
      if(req.getParameter("id") != null) {
                 try {

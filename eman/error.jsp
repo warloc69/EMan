@@ -8,5 +8,6 @@
 </head>
 <body>
 <%=request.getParameter("error_id") %>
+<a href="<%=request.getContextPath()%>/index.jsp">Top > </a>
 </body>
 </html>

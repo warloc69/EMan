@@ -25,6 +25,13 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
 		}
 		return workersname;
 	}
+	/**
+     * method processes the request from user and generate response with workers list
+     * @param req it's request
+     * @param resp it's response
+     * @throws ConfigLoaderException  when got incorrect configs file.
+     * @throws DataAccessException when can't access to data.
+     */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
         if("view_worker".equals(req.getParameter("action_id"))) {
                 try {

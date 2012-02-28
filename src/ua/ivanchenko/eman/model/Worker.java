@@ -12,51 +12,107 @@ public class Worker implements IWorker {
     private BigInteger jobid = null;
     private BigInteger officeid = null;
     private double salegrade = 0;
+    /**
+     * method return worker id.
+     */
     public BigInteger getID() {
         return id;
     }
+    /**
+     * method sets worker's identifier
+     * @param id inserting identifier.
+     */
     public void setID(BigInteger id) {
         this.id = id;
     }
+    /**
+     * method returns worker's first name.
+     */
     public String getFirstName() {
         return fname;
     }
+    /**
+     * method inserts worker's first name.
+     * @param name is worker's first name.
+     */
     public void setFirstName(String fname) {
         this.fname = fname;
     }
+    /**
+     * method returns worker's last name.
+     */
     public String getLastName() {
         return lname;
     }
+    /**
+     * method inserts worker's last name.
+     * @param name is worker's last name.
+     */
     public void setLastName(String lname) {
         this.lname = lname;
     }
+    /**
+     * Method returns manager's identifier.
+     */
     public BigInteger getManagerID() {
         return mgrid;
     }
+    /**
+     * method sets manager's identifier 
+     * @param id inserting id.
+     */
     public void setManagerID(BigInteger mgrid) {
         this.mgrid = mgrid;
     }
+    /**
+     * Method returns department's identifier.
+     */
     public BigInteger getDepartmentID() {
         return depid;
     }
+    /**
+     * method sets department's identifier
+     * @param id inserting identifier.
+     */
     public void setDepartmentID(BigInteger depid) {
         this.depid = depid;
     }
+    /**
+     * Method returns job's identifier.
+     */
     public BigInteger getJobID() {
         return jobid;
     }
+    /**
+     * method sets job's identifier
+     * @param id inserting identifier.
+     */
     public void setJobID(BigInteger jobid) {
         this.jobid = jobid;
     }
+    /**
+     * Method returns office's identifier.
+     */
     public BigInteger getOfficeID() {
         return officeid;
     }
+    /**
+     * method sets office's identifier
+     * @param id inserting id.
+     */
     public void setOfficeID(BigInteger officeid) {
         this.officeid = officeid;
     }
+    /**
+     * method returns worker's salegrade.
+     */
     public double getSalegrade() {
         return salegrade;
     }
+    /**
+     * method sets worker's salegrade.
+     * @param sale is worker's salegrade.
+     */
     public void setSalegrade(double salegrade) {
         this.salegrade = salegrade;
     }

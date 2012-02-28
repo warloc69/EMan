@@ -10,9 +10,17 @@ import ua.ivanchenko.eman.exceptions.ConfigLoaderException;
 import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IWorker;
+import ua.ivanchenko.eman.model.OracleDataAccessorConst;
 import ua.ivanchenko.eman.model.Worker;
 public class EditWorkerActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
+	/**
+     * method processes the request from user and generate response
+     * @param req it's request
+     * @param resp it's response
+     * @throws ConfigLoaderException  when got incorrect configs file.
+     * @throws DataAccessException when can't access to data.
+     */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
     	if("edit_worker_add".equals(req.getParameter("action_id"))) {   
     		if(req.getParameter("lname") == null) {
@@ -42,8 +50,12 @@ public class EditWorkerActionProcessor implements ActionProcessor {
                     worker.setSalegrade(Double.parseDouble(req.getParameter("sal")));
                     access.addWorker(worker);
                     try {
-                    	if (req.getParameter("mgr_id") != null) {
-                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("mgr_id"));
+                    	if (req.getParameter("mgr_id") != null ) {
+                    		if(!"null".equals(req.getParameter("mgr_id"))) {
+                    			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("mgr_id"));
+                    		} else {
+                        		resp.sendRedirect("index.jsp");
+                        	}
                     	} else {
                     		resp.sendRedirect("index.jsp");
                     	}
@@ -101,16 +113,24 @@ public class EditWorkerActionProcessor implements ActionProcessor {
     	 } else if ("edit_worker_remove".equals(req.getParameter("action_id")))  {
              try {	
             	 	BigInteger mgr_id = access.getWorkerByID(new BigInteger(req.getParameter("id"))).getManagerID();
-                   access.removeWorker(new BigInteger(req.getParameter("id")));
+            	 	if (!access.isWorkerExist(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID,(new BigInteger(req.getParameter("id"))))) {
+            	 		access.removeWorker(new BigInteger(req.getParameter("id")));
+                	} else {
+                		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+                	}        
                     try {
                     	log.info("remove: ");
-                        resp.sendRedirect("index.jsp?action_id=view_top_manager&id="+mgr_id);
+                    	if (mgr_id != null) { 
+                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&id="+mgr_id);
+                    	} else {
+                    		resp.sendRedirect("index.jsp");
+                    	}
                     } catch (IOException e) {
                         log.error("can't redirect on the showworkers.jsp",e);
                     }
                 } catch (DataAccessException e) {
                 	try {
-						resp.sendRedirect("error.jsp?error_id="+e.getMessage()+e.getCause());
+						resp.sendRedirect("error.jsp?error_id="+e.getMessage());
 					} catch (IOException e1) {
 						log.error("can't redirect on the showworkr.jsp",e);
 					}

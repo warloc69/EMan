@@ -1,5 +1,8 @@
 package ua.ivanchenko.eman.exceptions;
-
+/**
+* Class create exception ConfigLoaderException.
+* This exception calls, when got incorrect configs file.
+*/
 public class ConfigLoaderException extends Exception {
 
 	private static final long serialVersionUID = 1L;

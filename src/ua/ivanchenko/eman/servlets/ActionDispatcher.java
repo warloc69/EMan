@@ -36,8 +36,11 @@ public class ActionDispatcher extends HttpServlet {
         if (!"edit_worker_add".equals(action) ) {
 	        if((request.getParameter("id") != null) && "null".equals(request.getParameter("id"))) {
 	        	log.info("redirect from do get");
-	        	response.sendRedirect("index.jsp");
-	        	return;
+	        	if (!"filter".equals(action)) 
+	        	{	
+	        		response.sendRedirect("index.jsp");
+	        		return;
+	            }
 	        }
         }
         try {

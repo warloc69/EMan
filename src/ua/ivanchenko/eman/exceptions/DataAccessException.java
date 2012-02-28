@@ -1,10 +1,10 @@
 package ua.ivanchenko.eman.exceptions;
-
+/**
+* Class create exception DataAccessException.
+* This exception calls, when can't access to data.
+*/
 public class DataAccessException extends Exception {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public DataAccessException() {

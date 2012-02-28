@@ -9,8 +9,16 @@ import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IJob;
 import ua.ivanchenko.eman.model.Job;
+import ua.ivanchenko.eman.model.OracleDataAccessorConst;
 public class EditJobActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
+	/**
+     * method processes the request from user and generate response
+     * @param req it's request
+     * @param resp it's response
+     * @throws ConfigLoaderException  when got incorrect configs file.
+     * @throws DataAccessException when can't access to data.
+     */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
     	log.info("EditJobActionProcessor{action_id:"+req.getParameter("action_id")+"} {URI:"+req.getRequestURI()+"}");
         if("edit_job_add".equals(req.getParameter("action_id"))) {            
@@ -63,8 +71,7 @@ public class EditJobActionProcessor implements ActionProcessor {
             		}
             } else if ("edit_job_remove".equals(req.getParameter("action_id")))  {
                 try {
-                	log.info("remove job: size ="+ access.getWorkerByJobID(new BigInteger(req.getParameter("id"))).size());
-                	if (access.getWorkerByJobID(new BigInteger(req.getParameter("id"))).size() == 0 ) {
+                	if (!access.isWorkerExist(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID,(new BigInteger(req.getParameter("id"))))) {
                 		access.removeJob(new BigInteger(req.getParameter("id")));
                 	} else {
                 		throw new DataAccessException("Cannot remove job becose job is use");

@@ -32,12 +32,12 @@
          HashMap<BigInteger,String> jobs = (HashMap<BigInteger,String>) session.getAttribute("w_jobs");
          HashMap<BigInteger,String> managers = (HashMap<BigInteger,String>) session.getAttribute("w_manager");
          if (request.getParameter("id") != null) {
-        	 if (request.getParameter("select") == null) {%>
+        	 if (request.getParameter("select") == null ) {%>
 	        	 <a href="<%=request.getContextPath()%>/?action_id=view_top_manager"> Top</a>&nbsp;>&nbsp;
 	       <%} else {%>
                  <a href="<%=request.getContextPath()%>/?action_id=view_top_manager&select=true"> Top</a>&nbsp;>&nbsp;
            <%}
-	         if(path != null) {
+	         if(path != null && !"search".equals(request.getParameter("action_id"))) {
 	        	 if(path.size() != 0) {
 	        		 for (IWorker wor : path) {
 	        			 if(request.getParameter("select") == null) {%>
@@ -75,7 +75,47 @@
 	                <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&select=true&sort=DEPARTMENT_ID<%= request.getParameter("id") != null? "&id="+request.getParameter("id"):"" %>"><p1>Department</p1></a></td>
 	                <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&select=true&sort=SALEGRADE<%= request.getParameter("id") != null? "&id="+request.getParameter("id"):"" %>"><p1>Salegrade</p1></a></td>
 	            <%}%>
-	        </tr>	       
+	        </tr>
+		        <form name="f3" action="<%=request.getContextPath()%>/" method="get"  >
+		        <tr>
+		          <td> </td>
+		          <%  if (request.getParameter("fname") != null && !"null".equals(request.getParameter("fname"))) { %>
+		              <td><input type="text" name="fname" value="<%=request.getParameter("fname") %>" /></td>
+		          <%} else {%>
+		              <td><input type="text" name="fname" value="" /></td>
+		          <%} %>
+		          <%  if (request.getParameter("lname") != null && !"null".equals(request.getParameter("lname"))) { %>
+		           <td><input type="text" name="lname" value="<%=request.getParameter("lname") %>" /></td>
+                  <%} else {%>
+                      <td><input type="text" name="lname" value="" /></td>
+                  <%} %>
+		          <td></td>
+		          <%  if (request.getParameter("job") != null && !"null".equals(request.getParameter("job"))) { %>
+                   <td><input type="text" name="job" value="<%=request.getParameter("job") %>" /></td>
+                  <%} else {%>
+                      <td><input type="text" name="job" value="" /></td>
+                  <%} %>
+                  <%  if (request.getParameter("office") != null && !"null".equals(request.getParameter("office"))) { %>
+                   <td><input type="text" name="office" value="<%=request.getParameter("office") %>" /></td>
+                  <%} else {%>
+                      <td><input type="text" name="office" value="" /></td>
+                  <%} %>
+                   <%  if (request.getParameter("dept") != null && !"null".equals(request.getParameter("dept"))) { %>
+                   <td><input type="text" name="dept" value="<%=request.getParameter("dept") %>" /></td>
+                  <%} else {%>
+                      <td><input type="text" name="dept" value="" /></td>
+                  <%} %>
+		          <td></td>
+		          <% if (request.getParameter("select") != null) {%>
+		              <input type="hidden" name="select" value="true" />
+		          <%} %>    
+		          <%if (request.getParameter("id") != null) {%>		        
+		              <input type="hidden" name="id" value="<%=request.getParameter("id") %>" />
+		          <%} %>
+		          <input type="hidden" name="action_id" value="filter" /> 
+		          <td><input type="submit" value="filtering" /></td>		        
+	        </tr>    
+	        </form> 
           <%
           if(workers.size()==0) {%>
         	<tr><td><p>No subordinate.</p></td></tr>  
@@ -161,6 +201,7 @@
 			    <td><%= wor.getSalegrade() %></td>
 			  </tr>
         </table>
+        <a href="<%=request.getContextPath()%>/?action_id=edit_worker_update&id=<%= wor.getID() %>" ><img alt="Edit" src="<%=request.getContextPath()%>/resource/edit.png" border="0"></a>
     <%
        } else {
              IWorker worker = (IWorker) session.getAttribute("w_worker"); 

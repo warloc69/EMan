@@ -1,5 +1,8 @@
 package ua.ivanchenko.eman.exceptions;
-
+/**
+* Class create exception CreateProcessorException.
+* This exception calls, when we can't made new action processor.
+*/
 public class CreateProcessorException extends Exception {
 
 	private static final long serialVersionUID = 1L;

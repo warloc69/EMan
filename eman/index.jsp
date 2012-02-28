@@ -14,13 +14,15 @@
         background: #888888;
         border: 2px;
     }
-    p1 {
+    p1 { 
+         text-align: center;
          color: #880000;
     }
-    p {
+    p { text-align: center;
         color: white;
     }
     td, th {
+      text-align: center;
 	  border: 2px;
 	  padding: .8em;
 	  color: #000000;
@@ -37,7 +39,7 @@
     thead th, tfoot th {
 	  font: bold 10px helvetica, verdana, arial, sans-serif;
 	  border: 2px;
-	  text-align: left;
+	  text-align: center;
 	  background: #888888;
 	  color: #00FF0C;
 	  padding-top:4px;
@@ -116,7 +118,7 @@
 	       <%if (!"search".equals(request.getParameter("action_id"))) {%>
 		        <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
 		            <jsp:include page="<%= path_manager %>" />
-		        <%}  else if (request.getParameter("id") != null) {%>
+		        <%}  else if (request.getParameter("id") != null && request.getParameter("filtre") == null) {%>
 		           <jsp:include page="<%= path_manager %>" />
 		        <%} %>		        
 	           <%@ include file="showworkers.jsp" %>

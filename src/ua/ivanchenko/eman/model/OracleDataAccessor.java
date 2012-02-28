@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -23,6 +24,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 
 import ua.ivanchenko.eman.exceptions.DataAccessException;
+import ua.ivanchenko.eman.processors.JspConst;
 
 
 public final class OracleDataAccessor  implements IDataAccessor {
@@ -945,12 +947,12 @@ public final class OracleDataAccessor  implements IDataAccessor {
              resClean(connection,prep,null);
          }
     }
-    public Collection<IWorker> getWorkerByJobID(BigInteger id) throws DataAccessException {
+    public boolean isWorkerExist(String command, BigInteger id) throws DataAccessException {
    	 	PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID);
+            prep = connection.prepareStatement(command);
             prep.setBigDecimal(1, new BigDecimal(id));
             ResultSet rset = prep.executeQuery();
             LinkedList<IWorker> ls = new LinkedList<IWorker>();
@@ -960,6 +962,129 @@ public final class OracleDataAccessor  implements IDataAccessor {
                 worker.setLastName(rset.getString(2));
                 ls.add(worker);
             }
+            return ls.size() > 0 ? true : false;
+        } catch (SQLException e) {
+            log.error("Get worker by mgr id sql error",e);
+            throw new DataAccessException("Get worker by mgr id sql error",e);
+        } finally {
+            resClean(connection,prep,null);
+        }
+   }
+    public Collection<IWorker> filteringWorker(BigInteger id, HashMap<String,String> filters) throws DataAccessException {
+   	 	PreparedStatement prep = null;
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            StringBuffer sb = new StringBuffer();
+            sb.append("select * from employees ");
+            String job = filters.get(JspConst.job);
+            String dept = filters.get(JspConst.dept);
+            String office = filters.get(JspConst.office);
+            String lname = filters.get(JspConst.lname);
+            String fname = filters.get(JspConst.fname);
+            boolean pref = false;
+            	if (job != null) {
+            		sb.append(",jobs ");
+            	}
+            	if (dept != null) {
+            		sb.append(",departments ");
+            	}
+            	if (office != null) {
+            		sb.append(",offices ");
+            	}
+            	sb.append(" where ");
+            	if (job != null) {
+            		sb.append("jobs.id=employees.job_id ");
+            		sb.append(" and jobs.title=? ");
+            		pref = true;
+            	}
+            	if (dept != null) {
+            		if (pref) {
+            			sb.append(" and ");
+            		} 
+            		sb.append(" departments.id = employees.department_id ");
+            		sb.append(" and departments.title=? ");
+            		pref = true;            		            		
+            	}
+            	if (office != null) {
+            		if (pref) {
+            			sb.append(" and ");
+            		} 
+            		sb.append(" offices.id = employees.office_id ");
+            		sb.append(" and offices.title=? ");
+            		pref = true;            		            		
+            	}
+            	if (fname != null) {
+            		if (pref) {
+            			sb.append(" and ");
+            		} 
+            		sb.append(" employees.firstname=? ");
+            		pref = true;            		           		
+            	}
+            	if (lname != null) {
+            		if (pref) {
+            			sb.append(" and ");
+            		} 
+            		sb.append(" employees.lastname=? ");
+            		pref = true;            		            		
+            	}
+            	if (id != null ) {
+            		if (pref) {
+            			sb.append(" and ");
+            		} sb.append(" employees.mgrid=? ");            		            		
+            	} else {
+            		if (pref) {
+            			sb.append(" and ");
+            		} 
+            		sb.append(" employees.mgrid is null ");
+            		
+            	}
+            int i = 1;
+            log.debug("query : "+ sb.toString());
+            prep = connection.prepareStatement(sb.toString());
+            if (job != null) {
+            	prep.setString(i, job);
+            	i++;
+            }
+            if (dept != null) {
+            	prep.setString(i, dept);
+            	i++;
+            }
+            if (office != null) {
+            	prep.setString(i, office);
+            	i++;
+            }
+            if (fname != null) {
+            	prep.setString(i, fname);
+            	i++;
+            }
+            if (lname != null) {
+            	prep.setString(i, lname);
+            	i++;
+            }
+            if (id != null) {
+            	prep.setBigDecimal(i, new BigDecimal(id));
+            }
+            ResultSet rset = prep.executeQuery();
+            LinkedList<IWorker> ls = new LinkedList<IWorker>();
+            while (rset.next()) {
+                IWorker worker = new Worker();
+                worker.setFirstName(rset.getString("FIRSTNAME"));
+                worker.setLastName(rset.getString("LASTNAME"));
+                worker.setID(rset.getBigDecimal("ID").toBigInteger());
+                worker.setJobID(rset.getBigDecimal("JOB_ID").toBigInteger());
+                worker.setOfficeID(rset.getBigDecimal("OFFICE_ID").toBigInteger());
+                worker.setDepartmentID(rset.getBigDecimal("DEPARTMENT_ID").toBigInteger());
+                if (rset.getBigDecimal("MGRID") != null) {
+                	worker.setManagerID(rset.getBigDecimal("MGRID").toBigInteger());
+                } else {
+                	worker.setManagerID(null);
+                }
+                worker.setSalegrade(rset.getDouble("SALEGRADE"));
+                log.info("worker: "+ worker.getLastName());
+                ls.add(worker);
+            }
+            log.info(ls);
             return ls;
         } catch (SQLException e) {
             log.error("Get worker by mgr id sql error",e);

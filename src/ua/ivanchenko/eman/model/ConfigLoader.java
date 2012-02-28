@@ -1,5 +1,7 @@
 package ua.ivanchenko.eman.model;
-
+/**
+ * Class load config file.
+ */
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
