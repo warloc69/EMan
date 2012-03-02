@@ -9,6 +9,13 @@
 			window.opener.window.document.forms.f1.elements.man.value = name;
 			window.opener.window.document.forms.f1.elements.mgr_id.value = id;
 		}
+		function clear() {
+		     window.document.forms.f3.elements.fname.value = "";
+		     window.document.forms.f3.elements.lname.value = "";
+		     window.document.forms.f3.elements.job.value = "";
+		     window.document.forms.f3.elements.office.value = "";
+		     window.document.forms.f3.elements.dept.value = "";
+		 }
 	</script>
 	<%if (request.getParameter("select") == null) { %>
 		<table border="0">
@@ -37,7 +44,7 @@
 	       <%} else {%>
                  <a href="<%=request.getContextPath()%>/?action_id=view_top_manager&select=true"> Top</a>&nbsp;>&nbsp;
            <%}
-	         if(path != null && !"search".equals(request.getParameter("action_id"))) {
+	         if(path != null && !"search".equalsIgnoreCase(request.getParameter("action_id"))) {
 	        	 if(path.size() != 0) {
 	        		 for (IWorker wor : path) {
 	        			 if(request.getParameter("select") == null) {%>
@@ -52,7 +59,7 @@
          if (workers != null && request.getParameter("tab") == null) {%>
        <table border="2">  
 	        <tr>   
-		        <%if (request.getParameter("id") != null) {%>
+		        <%if (request.getParameter("id") != null && request.getParameter("select") == null) {%>
 		           <th colspan="7"></th><td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&id=<%= request.getParameter("id") %>">subordinate</a></td>
 		           <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&tab=details&id=<%= request.getParameter("id") %>">details</a></td>
 		        <%}%>
@@ -79,28 +86,28 @@
 		        <form name="f3" action="<%=request.getContextPath()%>/" method="get"  >
 		        <tr>
 		          <td> </td>
-		          <%  if (request.getParameter("fname") != null && !"null".equals(request.getParameter("fname"))) { %>
+		          <%  if (request.getParameter("fname") != null && !"null".equalsIgnoreCase(request.getParameter("fname"))) { %>
 		              <td><input type="text" name="fname" value="<%=request.getParameter("fname") %>" /></td>
 		          <%} else {%>
 		              <td><input type="text" name="fname" value="" /></td>
 		          <%} %>
-		          <%  if (request.getParameter("lname") != null && !"null".equals(request.getParameter("lname"))) { %>
+		          <%  if (request.getParameter("lname") != null && !"null".equalsIgnoreCase(request.getParameter("lname"))) { %>
 		           <td><input type="text" name="lname" value="<%=request.getParameter("lname") %>" /></td>
                   <%} else {%>
                       <td><input type="text" name="lname" value="" /></td>
                   <%} %>
 		          <td></td>
-		          <%  if (request.getParameter("job") != null && !"null".equals(request.getParameter("job"))) { %>
+		          <%  if (request.getParameter("job") != null && !"null".equalsIgnoreCase(request.getParameter("job"))) { %>
                    <td><input type="text" name="job" value="<%=request.getParameter("job") %>" /></td>
                   <%} else {%>
                       <td><input type="text" name="job" value="" /></td>
                   <%} %>
-                  <%  if (request.getParameter("office") != null && !"null".equals(request.getParameter("office"))) { %>
+                  <%  if (request.getParameter("office") != null && !"null".equalsIgnoreCase(request.getParameter("office"))) { %>
                    <td><input type="text" name="office" value="<%=request.getParameter("office") %>" /></td>
                   <%} else {%>
                       <td><input type="text" name="office" value="" /></td>
                   <%} %>
-                   <%  if (request.getParameter("dept") != null && !"null".equals(request.getParameter("dept"))) { %>
+                   <%  if (request.getParameter("dept") != null && !"null".equalsIgnoreCase(request.getParameter("dept"))) { %>
                    <td><input type="text" name="dept" value="<%=request.getParameter("dept") %>" /></td>
                   <%} else {%>
                       <td><input type="text" name="dept" value="" /></td>
@@ -113,7 +120,21 @@
 		              <input type="hidden" name="id" value="<%=request.getParameter("id") %>" />
 		          <%} %>
 		          <input type="hidden" name="action_id" value="filter" /> 
-		          <td><input type="submit" value="filtering" /></td>		        
+		          <td><input type="submit" value="filtering" /></td>
+		          <%if (request.getParameter("id") != null) {
+		              if (request.getParameter("select") == null) { %>               
+                         <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&id=<%=request.getParameter("id")%>" onclick="clear()">&nbsp; Clear &nbsp;</a></td>   
+                      <%} else { %>  
+                        <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&select=true&id=<%=request.getParameter("id")%>" onclick="clear()">&nbsp; Clear &nbsp;</a></td>   
+                      <%} %>
+                  <%}  else  {%>
+                        <%if (request.getParameter("select") == null) {%>
+                            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager" onclick="clear()">&nbsp; Clear &nbsp;</a></td>
+                       <%} else { %>
+                            <td><a href="<%=request.getContextPath()%>/?action_id=view_top_manager&select=true" onclick="clear()">&nbsp; Clear &nbsp;</a></td>
+                       <%} %> 
+                  <%} %>	
+		                
 	        </tr>    
 	        </form> 
           <%
@@ -160,7 +181,7 @@
              </tr>
          <%}%>
       </table>
-   <%} else if ("details".equals(request.getParameter("tab"))) {
+   <%} else if ("details".equalsIgnoreCase(request.getParameter("tab"))) {
         IWorker wor = (IWorker) session.getAttribute("wor");%>
          <table border="2">
 			  <tr>
@@ -242,7 +263,11 @@
 	                <input type="text" name="id"/>
 	                <input type="submit" value="Search"/>
 	             </form>
-	            <a href="<%=request.getContextPath()%>/?action_id=edit_worker_add&id=<%= request.getParameter("id") %>" ><img alt="Add" src="<%=request.getContextPath()%>/resource/add.png" border="0"></a>
+	             <%if (request.getParameter("id") != null) {%>
+	                   <a href="<%=request.getContextPath()%>/?action_id=edit_worker_add&id=<%= request.getParameter("id") %>" ><img alt="Add" src="<%=request.getContextPath()%>/resource/add.png" border="0"></a>
+	               <%} else { %>
+	                <a href="<%=request.getContextPath()%>/?action_id=edit_worker_add" ><img alt="Add" src="<%=request.getContextPath()%>/resource/add.png" border="0"></a>
+	               <%} %>
 	        <%} else {%>
 	            <form name="f2" action="<%=request.getContextPath()%>/" method="get">
 	                <input type="hidden" name="action_id" value="search"/>

@@ -80,6 +80,13 @@
 </head>
 <body>
 <script language="JavaScript" type="text/javascript">
+function trim(str) {
+    var newstr = str.replace(/^\s*(.+?)\s*$/, "$1");
+    if (newstr == " ") {
+        return "";
+    }
+    return newstr;
+}
    var manager_id;
  function butOpenWin_onclick(winUrl, winWidth, winHeight) {
     var winTop = (screen.height / 2) - 125;
@@ -92,11 +99,11 @@
     newWindow = window.open(winUrl, "myWindow", windowFeatures);
   }
  function validate() {
-     if (window.document.forms.f1.elements.title.value == "") {
+     if (trim(window.document.forms.f1.elements.title.value) == "") {
          alert("Write titlename");
          return false;
      }
-     if (window.document.forms.f1.elements.adr.value == "") {
+     if (trim(window.document.forms.f1.elements.adr.value) == "") {
          alert("Write addres name");
          return false;
      }
@@ -108,16 +115,16 @@
             <%
             HashMap<String,String> info = (HashMap<String,String>) request.getSession().getAttribute("info");
             IOffice office = (IOffice) request.getSession().getAttribute("e_office");
-            if("edit_office_update".equals(request.getParameter("action_id")))
+            if("edit_office_update".equalsIgnoreCase(request.getParameter("action_id")))
                 {
             %>
             <tr> 
                 <td><p1>Title:</p1></td>
-                <td><input name="title" value="<%=office.getTitle() %> " /></td> 
+                <td><input name="title" value="<%=office.getTitle() %>" /></td> 
             </tr>
              <tr>
                 <td><p1>Address:</p1></td>
-                <td><input name="adr" value="<%=office.getAddress() %> " /></td> 
+                <td><input name="adr" value="<%=office.getAddress() %>" /></td> 
                 <input type="hidden" name="id" value=<%=office.getID() %> /> 
                 <input type="hidden" name="edit_id" value=1 /> 
                 <input type="hidden" name="action_id" value=edit_office_update />

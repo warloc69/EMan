@@ -9,7 +9,6 @@ import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IJob;
 import ua.ivanchenko.eman.model.Job;
-import ua.ivanchenko.eman.model.OracleDataAccessorConst;
 public class EditJobActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
 	/**
@@ -19,10 +18,10 @@ public class EditJobActionProcessor implements ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
     	log.info("EditJobActionProcessor{action_id:"+req.getParameter("action_id")+"} {URI:"+req.getRequestURI()+"}");
-        if("edit_job_add".equals(req.getParameter("action_id"))) {            
-        	if(req.getParameter("title")== null) {
+        if("edit_job_add".equalsIgnoreCase(req.getParameter("action_id"))) {            
+        	if(req.getMethod().equalsIgnoreCase("GET")) {
     			try {
 					resp.sendRedirect("editjob.jsp?action_id=edit_job_add");
 				} catch (IOException e) {
@@ -43,9 +42,9 @@ public class EditJobActionProcessor implements ActionProcessor {
                     log.error("can't gets data from IDataAccessor",e);
                 }
     		}
-        } else if ("edit_job_update".equals(req.getParameter("action_id"))) {
+        } else if ("edit_job_update".equalsIgnoreCase(req.getParameter("action_id"))) {
             	log.info("EditJobActionProcessor (update){title:"+req.getParameter("title")+"} {id:"+req.getParameter("id")+"}");
-            		if(req.getParameter("title")== null) {
+            		if(req.getMethod().equalsIgnoreCase("GET")) {
             			IJob job = access.getJobByID(new BigInteger(req.getParameter("id")));
             			req.getSession().setAttribute("e_job", job);
             			try {
@@ -69,18 +68,10 @@ public class EditJobActionProcessor implements ActionProcessor {
 		                    log.error("can't gets data from IDataAccessor",e);
 		                } 
             		}
-            } else if ("edit_job_remove".equals(req.getParameter("action_id")))  {
-                try {
-                	if (!access.isWorkerExist(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID,(new BigInteger(req.getParameter("id"))))) {
-                		access.removeJob(new BigInteger(req.getParameter("id")));
-                	} else {
-                		throw new DataAccessException("Cannot remove job becose job is use");
-                	}
-                    try {
-                        resp.sendRedirect("index.jsp?action_id=view_job");
-                    } catch (IOException e) {
-                        log.error("can't redirect on the showdepts.jsp",e);
-                    }
+            } else if ("edit_job_remove".equalsIgnoreCase(req.getParameter("action_id")))  {
+                try {                	
+                    access.removeJob(new BigInteger(req.getParameter("id")));
+                	resp.sendRedirect("index.jsp?action_id=view_job");
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                     try {
@@ -88,6 +79,8 @@ public class EditJobActionProcessor implements ActionProcessor {
 					} catch (IOException e1) {
 						log.error("can't redirect on the showjobs.jsp",e);
 					}
+                } catch (IOException e) {
+                    log.error("can't redirect on the showdepts.jsp",e);
                 }
             }
     }

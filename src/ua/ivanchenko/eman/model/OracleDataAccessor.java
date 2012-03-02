@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 
 import ua.ivanchenko.eman.exceptions.DataAccessException;
-import ua.ivanchenko.eman.processors.JspConst;
+import ua.ivanchenko.eman.processors.FiltreConst;
 
 
 public final class OracleDataAccessor  implements IDataAccessor {
@@ -565,8 +565,9 @@ public final class OracleDataAccessor  implements IDataAccessor {
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_LAST_NAME);
+            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_FIRST_NAME);
             prep.setString(1, lname);
+            prep.setString(2, lname);
             ResultSet rset = prep.executeQuery();
             HashSet<IWorker> ls = new HashSet<IWorker>();
             while (rset.next()) {
@@ -584,26 +585,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
                 worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
                 worker.setSalegrade(rset.getDouble(8));
                 ls.add(worker);
-            }
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_FIRST_NAME);
-            prep.setString(1, lname);
-            rset = prep.executeQuery();
-            while (rset.next()) {
-                IWorker worker = new Worker();
-                worker.setID(rset.getBigDecimal(1).toBigInteger());
-                worker.setFirstName(rset.getString(2));
-                worker.setLastName(rset.getString(3));
-                if (rset.getBigDecimal(4) != null){
-                	worker.setManagerID(rset.getBigDecimal(4).toBigInteger());
-                } else {
-                	worker.setManagerID(null);
-                }
-                worker.setDepartmentID(rset.getBigDecimal(5).toBigInteger());
-                worker.setJobID(rset.getBigDecimal(6).toBigInteger());
-                worker.setOfficeID(rset.getBigDecimal(7).toBigInteger());
-                worker.setSalegrade(rset.getDouble(8));
-                ls.add(worker);
-            }
+            }            
             return ls;
         } catch (SQLException e) {
             log.error("Get worker by last name sql error",e);
@@ -689,6 +671,9 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeDept(BigInteger id) throws DataAccessException {
+    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_DEPT_ID,id)) {
+    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	}
         PreparedStatement prep = null;
         Connection connection = null;
         try {
@@ -716,6 +701,9 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeJob(BigInteger id) throws DataAccessException {
+    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID,id)) {
+    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	}
         PreparedStatement prep = null;
         Connection connection = null;
         try {
@@ -744,6 +732,9 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeOffice(BigInteger id) throws DataAccessException {
+    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_OFFICE_ID,id)) {
+    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	}
         PreparedStatement prep = null;
         Connection connection = null;
         try {
@@ -772,6 +763,9 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeWorker(BigInteger id) throws DataAccessException {
+    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID,id)) {
+    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	}
         PreparedStatement prep = null;
         Connection connection = null;
         try {
@@ -947,22 +941,15 @@ public final class OracleDataAccessor  implements IDataAccessor {
              resClean(connection,prep,null);
          }
     }
-    public boolean isWorkerExist(String command, BigInteger id) throws DataAccessException {
+    private boolean isRemove(String command, BigInteger id) throws DataAccessException {
    	 	PreparedStatement prep = null;
         Connection connection = null;
         try {
             connection = getConnection();
             prep = connection.prepareStatement(command);
             prep.setBigDecimal(1, new BigDecimal(id));
-            ResultSet rset = prep.executeQuery();
-            LinkedList<IWorker> ls = new LinkedList<IWorker>();
-            while (rset.next()) {
-                IWorker worker = new Worker();
-                worker.setID(rset.getBigDecimal(1).toBigInteger());
-                worker.setLastName(rset.getString(2));
-                ls.add(worker);
-            }
-            return ls.size() > 0 ? true : false;
+            ResultSet rset = prep.executeQuery();            
+            return rset.next();
         } catch (SQLException e) {
             log.error("Get worker by mgr id sql error",e);
             throw new DataAccessException("Get worker by mgr id sql error",e);
@@ -977,11 +964,11 @@ public final class OracleDataAccessor  implements IDataAccessor {
             connection = getConnection();
             StringBuffer sb = new StringBuffer();
             sb.append("select * from employees ");
-            String job = filters.get(JspConst.job);
-            String dept = filters.get(JspConst.dept);
-            String office = filters.get(JspConst.office);
-            String lname = filters.get(JspConst.lname);
-            String fname = filters.get(JspConst.fname);
+            String job = filters.get(FiltreConst.job);
+            String dept = filters.get(FiltreConst.dept);
+            String office = filters.get(FiltreConst.office);
+            String lname = filters.get(FiltreConst.lname);
+            String fname = filters.get(FiltreConst.fname);
             boolean pref = false;
             	if (job != null) {
             		sb.append(",jobs ");

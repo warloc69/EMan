@@ -12,7 +12,6 @@ import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IOffice;
 import ua.ivanchenko.eman.model.Office;
-import ua.ivanchenko.eman.model.OracleDataAccessorConst;
 
 
 public class EditOfficeActionProcessor implements ActionProcessor {
@@ -24,9 +23,9 @@ public class EditOfficeActionProcessor implements ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
-    	if("edit_office_add".equals(req.getParameter("action_id"))) {   
-    		if(req.getParameter("title")== null) {
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
+    	if("edit_office_add".equalsIgnoreCase(req.getParameter("action_id"))) {   
+    		if(req.getMethod().equalsIgnoreCase("GET")) {
     			try {
 					resp.sendRedirect("editoffice.jsp?action_id=edit_office_add");
 				} catch (IOException e) {
@@ -37,7 +36,7 @@ public class EditOfficeActionProcessor implements ActionProcessor {
                     IOffice office  = new Office();
                     office.setTitle(req.getParameter("title"));
                     office.setAddress(req.getParameter("adr"));
-                    if (!"null".equals(req.getParameter("mgr_id"))) {
+                    if (!"null".equalsIgnoreCase(req.getParameter("mgr_id"))) {
                     	office.setManagerID(new BigInteger(req.getParameter("mgr_id")));
                     } else {
                     	office.setManagerID(null);
@@ -52,8 +51,8 @@ public class EditOfficeActionProcessor implements ActionProcessor {
                     log.error("can't gets data from IDataAccessor",e);
                 } 
     		}
-    		} else if ("edit_office_update".equals(req.getParameter("action_id"))) {
-            	if(req.getParameter("title")== null) {
+    		} else if ("edit_office_update".equalsIgnoreCase(req.getParameter("action_id"))) {
+            	if(req.getMethod().equalsIgnoreCase("GET")) {
         			IOffice office = access.getOfficeByID(new BigInteger(req.getParameter("id")));
         			HashMap<String,String> info = new HashMap<String,String>();
         			if (office.getManagerID() != null ) {
@@ -75,7 +74,7 @@ public class EditOfficeActionProcessor implements ActionProcessor {
 	                    IOffice office  = new Office();
 	                    office.setTitle(req.getParameter("title"));
 	                    office.setAddress(req.getParameter("adr"));
-	                    if (!"null".equals(req.getParameter("mgr_id"))){
+	                    if (!"null".equalsIgnoreCase(req.getParameter("mgr_id"))){
 	                    	office.setManagerID(new BigInteger(req.getParameter("mgr_id")));
 	                    } else {
 	                    	office.setManagerID(null);
@@ -91,27 +90,19 @@ public class EditOfficeActionProcessor implements ActionProcessor {
 	                    log.error("can't gets data from IDataAccessor",e);
 	                } 
         		}    
-    		} else if ("edit_office_remove".equals(req.getParameter("action_id")))  {
+    		} else if ("edit_office_remove".equalsIgnoreCase(req.getParameter("action_id")))  {
                 try {
-                	if (!access.isWorkerExist(OracleDataAccessorConst.GET_WORKER_BY_OFFICE_ID,(new BigInteger(req.getParameter("id"))))) {
-                		access.removeOffice(new BigInteger(req.getParameter("id")));
-                	} else {
-                		throw new DataAccessException("Cannot remove office becose office is use");
-                	}                    
-                    try {
-                        resp.sendRedirect("index.jsp?action_id=view_office");
-                    } catch (IOException e) {
-                        log.error("can't redirect on the showoffices.jsp",e);
-                    }
+                	access.removeOffice(new BigInteger(req.getParameter("id")));                    
+                    resp.sendRedirect("index.jsp?action_id=view_office");                    
                 } catch (DataAccessException e) {
                 	try {
 						resp.sendRedirect("error.jsp?error_id="+e.getMessage());
 					} catch (IOException e1) {
 						log.error("can't redirect on the showoffices.jsp",e);
 					}
-                }
-                
-                        
+                } catch (IOException e) {
+                    log.error("can't redirect on the showoffices.jsp",e);
+                }       
         } 
 
     }

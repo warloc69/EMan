@@ -46,8 +46,35 @@ public class Job implements IJob {
         this.desc = desc;
     }
     @Override
-	public int hashCode() {
-		return id.intValue();
+   	public int hashCode() {
+   		return id.intValue();
+   	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Job other = (Job) obj;
+		if (desc == null) {
+			if (other.desc != null)
+				return false;
+		} else if (!desc.equals(other.desc))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
 	}
+   
 
 }

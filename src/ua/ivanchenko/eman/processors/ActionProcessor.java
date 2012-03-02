@@ -14,5 +14,5 @@ public interface ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor accessor) throws DataAccessException, ConfigLoaderException;
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor accessor) throws DataAccessException;
 }

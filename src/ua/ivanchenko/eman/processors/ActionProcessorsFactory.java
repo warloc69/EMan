@@ -12,12 +12,7 @@ public class ActionProcessorsFactory {
 	            Class<?> c;
 				try {
 					c = Class.forName(actionProcessor);
-				} catch (ClassNotFoundException e2) {
-					 log.error("class not found, processor: "+ actionProcessor,e2);
-		             throw new CreateProcessorException("class not found, processor: "+ actionProcessor,e2);
-				}
-	            try {
-	                Object obj = c.newInstance();
+				    Object obj = c.newInstance();
 	                if (obj instanceof ActionProcessor) {
 	                	log.info("create processor :"+ actionProcessor);
 	                    return (ActionProcessor) obj;
@@ -28,7 +23,10 @@ public class ActionProcessorsFactory {
 	            } catch (IllegalAccessException e1) {
 	                log.error("illegal access to the processor:"+ actionProcessor,e1);
 	                throw new CreateProcessorException("illegal access to the processor:"+ actionProcessor,e1);
-	            }
+	           } catch (ClassNotFoundException e2) {
+					 log.error("class not found, processor: "+ actionProcessor,e2);
+		             throw new CreateProcessorException("class not found, processor: "+ actionProcessor,e2);
+			   }
 	        } 
         }
          return new DefaultActionProcessor();        

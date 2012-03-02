@@ -79,12 +79,19 @@
 </head>
 <body>
 <script language="JavaScript" type="text/javascript">
+function trim(str) {
+    var newstr = str.replace(/^\s*(.+?)\s*$/, "$1");
+    if (newstr == " ") {
+        return "";
+    }
+    return newstr;
+}
  function validate() {
-     if (window.document.forms.f1.elements.title.value == "") {
+     if (trim(window.document.forms.f1.elements.title.value) == "") {
          alert("Write title name");
          return false;
      }
-     if (window.document.forms.f1.elements.desc.value == "") {
+     if (trim(window.document.forms.f1.elements.desc.value) == "") {
          alert("Write description name");
          return false;
      }
@@ -95,16 +102,16 @@
         <form  name="f1" action="<%=request.getContextPath()%>/" method="post" onSubmit="return validate()" >
             <%
             IDept dept = (IDept) request.getSession().getAttribute("e_dept");
-            if("edit_dept_update".equals(request.getParameter("action_id")))
+            if("edit_dept_update".equalsIgnoreCase(request.getParameter("action_id")))
                 {
             %>
             <tr> 
                 <td><p1>Title:</p1></td>
-                <td><input name="title" value=<%=dept.getTitle() %> /></td> 
+                <td><input name="title" value="<%=dept.getTitle() %>" /></td> 
             </tr>
              <tr>
                 <td><p1>Description:</p1></td>
-                <td><input name="desc" value="<%=dept.getDescription() %> " /></td> 
+                 <td> <TEXTAREA NAME="desc" COLS=40 ROWS=6 ><%=dept.getDescription()%></TEXTAREA></td> 
                 <input type="hidden" name="id" value=<%=dept.getID() %> /> 
                 <input type="hidden" name="edit_id" value=1  /> 
                 <input type="hidden" name="action_id" value=edit_dept_update />           
@@ -118,7 +125,7 @@
             </tr>
              <tr>
                 <td><p1>Description:</p1></td>
-                <td><input name="desc" /></td> 
+                <td><TEXTAREA NAME="desc" COLS=40 ROWS=6 ></TEXTAREA></td>
                 <input type="hidden" name="edit_id" value=0 /> 
                 <input type="hidden" name="action_id" value=edit_dept_add />           
              </tr>

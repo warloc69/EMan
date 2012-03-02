@@ -10,7 +10,6 @@ import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.Dept;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IDept;
-import ua.ivanchenko.eman.model.OracleDataAccessorConst;
 
 public class EditDeptActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
@@ -21,9 +20,9 @@ public class EditDeptActionProcessor implements ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp , IDataAccessor access) throws DataAccessException, ConfigLoaderException {
-    	if("edit_dept_add".equals(req.getParameter("action_id"))) {   
-    		if(req.getParameter("title")== null) {
+    public void process(HttpServletRequest req, HttpServletResponse resp , IDataAccessor access) throws DataAccessException{
+    	if("edit_dept_add".equalsIgnoreCase(req.getParameter("action_id"))) {  
+    		  if(req.getMethod().equalsIgnoreCase("GET") ) {
     			try {
 					resp.sendRedirect("editdept.jsp?action_id=edit_dept_add");
 				} catch (IOException e) {
@@ -45,7 +44,7 @@ public class EditDeptActionProcessor implements ActionProcessor {
                 }  
     		}
     	} else if ("edit_dept_update".equals(req.getParameter("action_id"))) {
-    		if(req.getParameter("title")== null) {
+    		if(req.getMethod().equalsIgnoreCase("GET")) {
         			IDept dept = access.getDeptByID(new BigInteger(req.getParameter("id")));
         			req.getSession().setAttribute("e_dept", dept);
         			try {
@@ -69,28 +68,19 @@ public class EditDeptActionProcessor implements ActionProcessor {
 	                    log.error("can't gets data from IDataAccessor",e);
 	                } 
         		}
-    		} else if ("edit_dept_remove".equals(req.getParameter("action_id")))  {
+    		} else if ("edit_dept_remove".equalsIgnoreCase(req.getParameter("action_id")))  {
                 try {
-                	if (!access.isWorkerExist(OracleDataAccessorConst.GET_WORKER_BY_DEPT_ID,(new BigInteger(req.getParameter("id"))))) {
-                		access.removeDept(new BigInteger(req.getParameter("id")));
-                	} else {
-                		throw new DataAccessException("Cannot remove department becose department is use");
-                	}                    
-                    try {
-                        resp.sendRedirect("index.jsp?action_id=view_dept");
-                    } catch (IOException e) {
-                        log.error("can't redirect on the showdepts.jsp",e);
-                    }
+                	access.removeDept(new BigInteger(req.getParameter("id")));                	
+                    resp.sendRedirect("index.jsp?action_id=view_dept");
                 } catch (DataAccessException e) {
                 	try {
 						resp.sendRedirect("error.jsp?error_id="+e.getMessage());
 					} catch (IOException e1) {
 						log.error("can't redirect on the showdepts.jsp",e);
 					}
+                } catch (IOException e) {
+                    log.error("can't redirect on the showdepts.jsp",e);
                 }
-            }            
-         
-
-    }
-
+            } 
+    	}
 }

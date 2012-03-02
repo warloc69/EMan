@@ -5,7 +5,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Insert title here</title>
+    <title>Eman</title>
     <style type="text/css">
      body {
         background-color: #888888;
@@ -94,29 +94,29 @@
     log.info("from index.jsp {URI:"+request.getRequestURI()+"}");
     if (request.getParameter("select") == null) {
     %>
-        <%if ("view_dept".equals(request.getParameter("action_id"))) {%>
+        <%if ("view_dept".equalsIgnoreCase(request.getParameter("action_id"))) {%>
 	       <%if(request.getParameter("sort")== null) {%> 
 	            <jsp:include page="<%= path_dept %>" />
 	        <% }%>
 	        <%@  include file="showdepts.jsp" %>
-	    <%} else if ("view_office".equals(request.getParameter("action_id"))) {%>
+	    <%} else if ("view_office".equalsIgnoreCase(request.getParameter("action_id"))) {%>
 	       <%if(request.getParameter("sort")== null) {%> 
 	           <jsp:include page="<%= path_office %>" />
 	       <%} %>
 	        <%@ include file="showoffices.jsp" %>
-	    <%} else if ("view_job".equals(request.getParameter("action_id"))) {%>
+	    <%} else if ("view_job".equalsIgnoreCase(request.getParameter("action_id"))) {%>
 	       <%if(request.getParameter("sort")== null) {%> 
 	           <jsp:include page="<%= path_job %>" />
 	       <%} %>
 	        <%@ include file="showjobs.jsp" %> 
-	    <%} else if ("view_worker".equals(request.getParameter("action_id"))) {%>
+	    <%} else if ("view_worker".equalsIgnoreCase(request.getParameter("action_id"))) {%>
 			   <% if (request.getParameter("id") != null ) { %>
 			      <jsp:include page="<%= path_worker %>" />
 			   <%} %>  
 			<%@ include file="showworkers.jsp" %> 
 	   <%} else {  %>
-	       <%if (!"search".equals(request.getParameter("action_id"))) {%>
-		        <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
+	       <%if (!"search".equalsIgnoreCase(request.getParameter("action_id"))) {%>
+		        <% if (!"view_top_manager".equalsIgnoreCase(request.getParameter("action_id")) ) { %>
 		            <jsp:include page="<%= path_manager %>" />
 		        <%}  else if (request.getParameter("id") != null && request.getParameter("filtre") == null) {%>
 		           <jsp:include page="<%= path_manager %>" />
@@ -127,23 +127,23 @@
 	       <%} %>
 	    <%} %>
     <%} else { %>
-        <%if ("view_dept".equals(request.getParameter("action_id"))) {%>
+        <%if ("view_dept".equalsIgnoreCase(request.getParameter("action_id"))) {%>
             <jsp:include page="<%= path_dept + \"&select=true\"%>" />
             <%@ include file="showdepts.jsp" %>
-        <%} else if ("view_office".equals(request.getParameter("action_id"))) {%>
+        <%} else if ("view_office".equalsIgnoreCase(request.getParameter("action_id"))) {%>
             <jsp:include page="<%= path_office + \"&select=true\"%>" />
             <%@ include file="showoffices.jsp" %>
-        <%} else if ("view_job".equals(request.getParameter("action_id"))) {%>
+        <%} else if ("view_job".equalsIgnoreCase(request.getParameter("action_id"))) {%>
             <jsp:include page="<%= path_job + \"&select=true\"%>" />
             <%@ include file="showjobs.jsp" %> 
-        <%} else if ("view_worker".equals(request.getParameter("action_id"))) {%>
+        <%} else if ("view_worker".equalsIgnoreCase(request.getParameter("action_id"))) {%>
                <% if (request.getParameter("id") != null ) { %>
                   <jsp:include page="<%= path_worker + \"&select=true\"%>" />
                <%} %>  
             <%@ include file="showworkers.jsp" %> 
         <%} else {  %>
-            <%if (!"search".equals(request.getParameter("action_id"))) {%>
-	            <% if (!"view_top_manager".equals(request.getParameter("action_id")) ) { %>
+            <%if (!"search".equalsIgnoreCase(request.getParameter("action_id"))) {%>
+	            <% if (!"view_top_manager".equalsIgnoreCase(request.getParameter("action_id")) ) { %>
 	                <jsp:include page="<%= path_manager + \"&select=true\"%>" />
 	            <%} %>
 	            <%@ include file="showworkers.jsp" %>

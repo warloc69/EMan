@@ -92,12 +92,19 @@
     windowFeatures += "top=" + winTop;
     newWindow = window.open(winUrl, "myWindow", windowFeatures);
   }
+ function trim(str) {
+	    var newstr = str.replace(/^\s*(.+?)\s*$/, "$1");
+	    if (newstr == " ") {
+	        return "";
+	    }
+	    return newstr;
+	}
  function validate() {
-	 if (window.document.forms.f1.elements.fname.value == "") {
+	 if (trim(window.document.forms.f1.elements.fname.value) == "") {
 		 alert("Write first name");
 		 return false;
 	 }
-	 if (window.document.forms.f1.elements.lname.value == "") {
+	 if (trim(window.document.forms.f1.elements.lname.value) == "") {
          alert("Write last name");
          return false;
      }
@@ -113,7 +120,7 @@
          alert("Choose department");
          return false;
      }
-	 if (window.document.forms.f1.elements.sal.value == "") {
+	 if (trim(window.document.forms.f1.elements.sal.value) == "") {
          alert("Write salegrad");
          return false;
      }
@@ -121,19 +128,19 @@
  }
  function clearman() {
 	 window.document.forms.f1.elements.mgr_id.value = "null";
-	 window.document.forms.f1.elements.man.value = " ";
+	 window.document.forms.f1.elements.man.value = "";
  }
  function clearjob() {
-     window.document.forms.f1.elements.job_id.value = "null";
-     window.document.forms.f1.elements.job.value = " ";
+     window.document.forms.f1.elements.job_id.value = "";
+     window.document.forms.f1.elements.job.value = "";
  }
  function cleardept() {
-     window.document.forms.f1.elements.dept_id.value = "null";
-     window.document.forms.f1.elements.dept.value = " ";
+     window.document.forms.f1.elements.dept_id.value = "";
+     window.document.forms.f1.elements.dept.value = "";
  }
  function clearoffice() {
-     window.document.forms.f1.elements.office_id.value = "null";
-     window.document.forms.f1.elements.office.value = " ";
+     window.document.forms.f1.elements.office_id.value = "";
+     window.document.forms.f1.elements.office.value = "";
  }
  </script>
     <table>
@@ -141,7 +148,7 @@
             <%
             IWorker work = (IWorker) request.getSession().getAttribute("e_worker");
             HashMap<String,String> info = (HashMap<String,String>) request.getSession().getAttribute("info");
-            if("edit_worker_update".equals(request.getParameter("action_id")))
+            if("edit_worker_update".equalsIgnoreCase(request.getParameter("action_id")))
                 {
             %>
             <tr> 
@@ -213,10 +220,10 @@
                <td><p1>Manager:</p1></td>
                <td>
                 <% if(wor != null) { %>
-	               <input type="text" name="man"  readonly value="<%=wor.getLastName() %>" />
-	               <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
-	               <a onclick="clearman()">&nbsp; - &nbsp;</a>
-	               <input type="hidden" name="mgr_id" value="<%=wor.getID() %>" />
+		               <input type="text" name="man"  readonly value="<%=wor.getLastName() %>" />
+		               <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>
+		               <a onclick="clearman()">&nbsp; - &nbsp;</a>
+		               <input type="hidden" name="mgr_id" value="<%=wor.getID() %>" />
 	               <%} else { %>
 		               <input type="text" name="man"  readonly value="" />
 	                   <a onclick="butOpenWin_onclick('index.jsp?select=true', 650, 450)">&nbsp;+&nbsp;</a>

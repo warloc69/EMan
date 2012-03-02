@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/eman" 
+         docBase="eman" 
+         debug="5" 
+         reloadable="true" 
+         crossContext="true">
+<Resource name="jdbc/eman_oracle" 
+          auth="Container" 
+          type="javax.sql.DataSource" 
+          driverClassName="oracle.jdbc.OracleDriver"  
+          password="student"
+          url="jdbc:oracle:thin:@127.0.0.1:1521:xe" 
+          username="system"/>    
+</Context>

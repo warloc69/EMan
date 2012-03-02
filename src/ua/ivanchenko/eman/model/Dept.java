@@ -50,8 +50,35 @@ public class Dept implements IDept {
     public void setDescription(String desc) {
         this.desc = desc;
     }
-	@Override
+    @Override
 	public int hashCode() {
 		return id.intValue();
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Dept other = (Dept) obj;
+		if (desc == null) {
+			if (other.desc != null)
+				return false;
+		} else if (!desc.equals(other.desc))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+	
 }

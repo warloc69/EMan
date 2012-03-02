@@ -64,7 +64,39 @@ public class Office implements IOffice {
         this.mgrid = mgrid;
     }
     @Override
-	public int hashCode() {
-		return id.intValue();
+   	public int hashCode() {
+   		return id.intValue();
+   	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Office other = (Office) obj;
+		if (address == null) {
+			if (other.address != null)
+				return false;
+		} else if (!address.equals(other.address))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (mgrid == null) {
+			if (other.mgrid != null)
+				return false;
+		} else if (!mgrid.equals(other.mgrid))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
 	}
+   
 }

@@ -4,10 +4,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Error</title>
 </head>
 <body>
 <%=request.getParameter("error_id") %>
-<a href="<%=request.getContextPath()%>/index.jsp">Top > </a>
+<a href="<%=request.getContextPath()%>/index.jsp">go to home page > </a>
 </body>
 </html>

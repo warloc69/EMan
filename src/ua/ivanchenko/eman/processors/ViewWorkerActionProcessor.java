@@ -32,8 +32,8 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
-        if("view_worker".equals(req.getParameter("action_id"))) {
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
+        if("view_worker".equalsIgnoreCase(req.getParameter("action_id"))) {
                 try {
                 	log.info("ViewWorkerActionPorcessor get id {id:"+req.getParameter("id")+"}");
                 	Collection<IWorker> workers  = access.getAllWorkers(null);
@@ -56,7 +56,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                     log.error("can't gets data from IDataAccessor",e);
                 } return;
         
-            } else if("view_top_manager".equals(req.getParameter("action_id"))) {
+            } else if("view_top_manager".equalsIgnoreCase(req.getParameter("action_id"))) {
                 try {
                 	log.info(" td ViewWorkerActionPorcessor get id { id:"+req.getParameter("id")+"} query string :" + req.getQueryString());
                 	Collection<IWorker> workers = null;
@@ -155,7 +155,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                 } return;
-            } else if ("search".equals(req.getParameter("action_id"))) {
+            } else if ("search".equalsIgnoreCase(req.getParameter("action_id"))) {
                     try {
                     	log.info("ViewWorkerActionPorcessor get id {last_name:"+req.getParameter("id")+"}");
                         Collection<IWorker> workers = access.getWorkersByName(req.getParameter("id"));

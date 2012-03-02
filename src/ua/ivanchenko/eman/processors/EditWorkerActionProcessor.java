@@ -10,7 +10,6 @@ import ua.ivanchenko.eman.exceptions.ConfigLoaderException;
 import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.IDataAccessor;
 import ua.ivanchenko.eman.model.IWorker;
-import ua.ivanchenko.eman.model.OracleDataAccessorConst;
 import ua.ivanchenko.eman.model.Worker;
 public class EditWorkerActionProcessor implements ActionProcessor {
 	private Logger log = Logger.getLogger("emanlogger");
@@ -21,14 +20,16 @@ public class EditWorkerActionProcessor implements ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
-    	if("edit_worker_add".equals(req.getParameter("action_id"))) {   
-    		if(req.getParameter("lname") == null) {
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
+    	if("edit_worker_add".equalsIgnoreCase(req.getParameter("action_id"))) {   
+    		if(req.getMethod().equalsIgnoreCase("GET")) {
     			try {
     				log.info("edit add id: "+req.getParameter("id"));
-    				if(!"null".equals(req.getParameter("id"))){
+    				if(req.getParameter("id") != null){
 	    				IWorker wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
 						req.getSession().setAttribute("e_wor", wor);
+    				} else {
+    					req.getSession().setAttribute("e_wor",null);
     				}
     				resp.sendRedirect("editworker.jsp?action_id=edit_worker_add");
 				} catch (IOException e) {
@@ -39,7 +40,7 @@ public class EditWorkerActionProcessor implements ActionProcessor {
                     IWorker worker  = new Worker();
                     worker.setFirstName(req.getParameter("fname"));
                     worker.setLastName(req.getParameter("lname"));
-                    if (!"null".equals(req.getParameter("mgr_id"))) {
+                    if (!"null".equalsIgnoreCase(req.getParameter("mgr_id"))) {
                     	worker.setManagerID(new BigInteger(req.getParameter("mgr_id")));
                     } else {
                     	worker.setManagerID(null);
@@ -51,7 +52,7 @@ public class EditWorkerActionProcessor implements ActionProcessor {
                     access.addWorker(worker);
                     try {
                     	if (req.getParameter("mgr_id") != null ) {
-                    		if(!"null".equals(req.getParameter("mgr_id"))) {
+                    		if(!"null".equalsIgnoreCase(req.getParameter("mgr_id"))) {
                     			resp.sendRedirect("index.jsp?action_id=view_top_manager&id=" + req.getParameter("mgr_id"));
                     		} else {
                         		resp.sendRedirect("index.jsp");
@@ -66,8 +67,8 @@ public class EditWorkerActionProcessor implements ActionProcessor {
                     log.error("can't gets data from IDataAccessor",e);
                 } 
     		}
-    	} else if ("edit_worker_update".equals(req.getParameter("action_id"))) {
-            	if(req.getParameter("lname") == null) {
+    	} else if ("edit_worker_update".equalsIgnoreCase(req.getParameter("action_id"))) {
+            	if(req.getMethod().equalsIgnoreCase("GET")) {
         			IWorker worker = access.getWorkerByID(new BigInteger(req.getParameter("id")));
         			req.getSession().setAttribute("e_worker", worker);
         			HashMap<String,String> info = new HashMap<String,String>();
@@ -91,7 +92,7 @@ public class EditWorkerActionProcessor implements ActionProcessor {
 	                    worker.setID(new BigInteger(req.getParameter("id")));
 	                    worker.setFirstName(req.getParameter("fname"));
 	                    worker.setLastName(req.getParameter("lname"));
-	                    if (!"null".equals(req.getParameter("mgr_id"))) {
+	                    if (!"null".equalsIgnoreCase(req.getParameter("mgr_id"))) {
 	                    	worker.setManagerID(new BigInteger(req.getParameter("mgr_id")));
 	                    } else {
 	                    	worker.setManagerID(null);
@@ -110,35 +111,25 @@ public class EditWorkerActionProcessor implements ActionProcessor {
 	                    log.error("can't gets data from IDataAccessor",e);
 	                } 
         		}
-    	 } else if ("edit_worker_remove".equals(req.getParameter("action_id")))  {
+    	 } else if ("edit_worker_remove".equalsIgnoreCase(req.getParameter("action_id")))  {
              try {	
-            	 	BigInteger mgr_id = access.getWorkerByID(new BigInteger(req.getParameter("id"))).getManagerID();
-            	 	if (!access.isWorkerExist(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID,(new BigInteger(req.getParameter("id"))))) {
-            	 		access.removeWorker(new BigInteger(req.getParameter("id")));
-                	} else {
-                		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
-                	}        
-                    try {
-                    	log.info("remove: ");
-                    	if (mgr_id != null) { 
-                    		resp.sendRedirect("index.jsp?action_id=view_top_manager&id="+mgr_id);
-                    	} else {
-                    		resp.sendRedirect("index.jsp");
-                    	}
-                    } catch (IOException e) {
-                        log.error("can't redirect on the showworkers.jsp",e);
-                    }
-                } catch (DataAccessException e) {
-                	try {
-						resp.sendRedirect("error.jsp?error_id="+e.getMessage());
-					} catch (IOException e1) {
-						log.error("can't redirect on the showworkr.jsp",e);
-					}
-                }
-                        
+            	  BigInteger mgr_id = access.getWorkerByID(new BigInteger(req.getParameter("id"))).getManagerID();            	 	
+            	  access.removeWorker(new BigInteger(req.getParameter("id")));
+                  if (mgr_id != null) { 
+                  	resp.sendRedirect("index.jsp?action_id=view_top_manager&id="+mgr_id);
+                  } else {
+                  	resp.sendRedirect("index.jsp");
+                  }
+                    
+             } catch (DataAccessException e) {
+                try {
+					resp.sendRedirect("error.jsp?error_id="+e.getMessage());
+				} catch (IOException e1) {
+					log.error("can't redirect on the showworkr.jsp",e);
+				}
+             } catch (IOException e) {
+                    log.error("can't redirect on the showworkers.jsp",e);
+             }        
         } 
-
-
     }
-
 }

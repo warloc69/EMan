@@ -20,7 +20,7 @@ public class ViewOfficeActionProcessor implements ActionProcessor {
      * @throws ConfigLoaderException  when got incorrect configs file.
      * @throws DataAccessException when can't access to data.
      */
-    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException, ConfigLoaderException {
+    public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
      if(req.getParameter("id") != null) {
                 try {
                     IOffice office = access.getOfficeByID(new BigInteger(req.getParameter("id")));

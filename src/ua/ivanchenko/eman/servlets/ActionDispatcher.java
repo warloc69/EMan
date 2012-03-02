@@ -32,32 +32,18 @@ public class ActionDispatcher extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action_id");
-        if (!"edit_worker_add".equals(action) ) {
-	        if((request.getParameter("id") != null) && "null".equals(request.getParameter("id"))) {
-	        	log.info("redirect from do get");
-	        	if (!"filter".equals(action)) 
-	        	{	
-	        		response.sendRedirect("index.jsp");
-	        		return;
-	            }
-	        }
-        }
         try {
 			IConfig config = (IConfig) getServletContext().getAttribute("config_class");
 			IDataAccessor accessor = DataAccessor.getInstance(config);
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
-			ActionProcessor proc = apf.getProcessor(action,config);
-			log.info("doGet{action_id:"+action+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
+			ActionProcessor proc = apf.getProcessor(request.getParameter("action_id"),config);
+			log.info("doGet{action_id:"+request.getParameter("action_id")+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
 			proc.process(request, response, accessor);
 		} catch (CreateProcessorException e) {
 			log.error("can't create the processor ", e);
 			response.sendRedirect("error.jsp");
 		} catch (DataAccessException e) {
 			log.error("can't get access to the processor ", e);
-			response.sendRedirect("error.jsp");
-		} catch (ConfigLoaderException e) {
-			log.error("can't get config file ", e);
 			response.sendRedirect("error.jsp");
 		}
     }
@@ -67,21 +53,18 @@ public class ActionDispatcher extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			IConfig config = (IConfig) getServletContext().getAttribute("config_class");
-				IDataAccessor accessor = DataAccessor.getInstance(config);
-				ActionProcessorsFactory apf = new ActionProcessorsFactory();
-				ActionProcessor proc = apf.getProcessor(request.getParameter("action_id"),config);
-				proc.process(request, response, accessor);
-				log.info((String) request.getParameter("hidden"));
+			IDataAccessor accessor = DataAccessor.getInstance(config);
+			ActionProcessorsFactory apf = new ActionProcessorsFactory();
+			ActionProcessor proc = apf.getProcessor(request.getParameter("action_id"),config);
+			proc.process(request, response, accessor);
+			log.info((String) request.getParameter("hidden"));
 		} catch (CreateProcessorException e) {
 			log.error("can't create the processor ", e);
 			response.sendRedirect("error.jsp");
 		} catch (DataAccessException e) {
 			log.error("can't get access to the processor ", e);
 			response.sendRedirect("error.jsp");
-		} catch (ConfigLoaderException e) {
-			log.error("can't get config file ", e);
-			response.sendRedirect("error.jsp");
-		}
+		} 
 	}
 	@Override
 	public void init(ServletConfig config) throws ServletException {

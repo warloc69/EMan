@@ -144,6 +144,5 @@ public interface IDataAccessor {
 	 */
 	public void updateWorker(IWorker worker) throws DataAccessException;
     public Collection<IWorker> getPath(BigInteger id) throws DataAccessException;
-    public boolean isWorkerExist(String command, BigInteger id) throws DataAccessException;
     public Collection<IWorker> filteringWorker(BigInteger id, HashMap<String,String> filters) throws DataAccessException;
 }
