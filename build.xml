@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <project name="04b.classpath" default="war" >
-	<property name="catalina.home" value="D:/tomcat/"/>
 	<target name="clear">
 		<delete dir="build"/>
 	</target>
@@ -9,8 +8,9 @@
         <mkdir dir="build/class"/>
     </target>
 	<target name="compile" description="compile java" depends="make.dirs">
+		<property environment="env"/>
         <javac destdir="build/class" 
-		classpath="lib/log4j-1.2.16.jar;${catalina.home}/lib/ojdbc14.jar;${catalina.home}/lib/servlet-api.jar">
+		classpath="lib/log4j-1.2.16.jar;${env.CATALINA_HOME}/lib/ojdbc14.jar;${env.CATALINA_HOME}/lib/servlet-api.jar">
             <src path="src"/>
         </javac>
     </target>
@@ -18,10 +18,7 @@
 		<war destfile="build/eman.war" webxml="eman/WEB-INF/web.xml">
 			<classes dir="build/class"/>
 			<fileset dir="eman"/>
-			<lib dir="lib">
-				<exclude name="ojdbc14.jar"/>
-				<exclude name="servlet-api.jar"/>
-			</lib>
+			<lib dir="lib"/>
 		</war>
 		<delete dir="build/class"/>
 	</target>

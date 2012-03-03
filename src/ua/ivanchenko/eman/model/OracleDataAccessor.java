@@ -565,7 +565,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
         Connection connection = null;
         try {
             connection = getConnection();
-            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_FIRST_NAME);
+            prep = connection.prepareStatement(OracleDataAccessorConst.GET_WORKER_BY_NAME);
             prep.setString(1, lname);
             prep.setString(2, lname);
             ResultSet rset = prep.executeQuery();
@@ -671,8 +671,8 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeDept(BigInteger id) throws DataAccessException {
-    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_DEPT_ID,id)) {
-    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	if (canRemove(OracleDataAccessorConst.GET_WORKER_BY_DEPT_ID,id)) {
+    		throw new DataAccessException("You can not remove department because the department is used");
     	}
         PreparedStatement prep = null;
         Connection connection = null;
@@ -701,8 +701,8 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeJob(BigInteger id) throws DataAccessException {
-    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID,id)) {
-    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	if (canRemove(OracleDataAccessorConst.GET_WORKER_BY_JOB_ID,id)) {
+    		throw new DataAccessException("You can not remove job because the job is used");
     	}
         PreparedStatement prep = null;
         Connection connection = null;
@@ -732,8 +732,8 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeOffice(BigInteger id) throws DataAccessException {
-    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_OFFICE_ID,id)) {
-    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	if (canRemove(OracleDataAccessorConst.GET_WORKER_BY_OFFICE_ID,id)) {
+    		throw new DataAccessException("You can not remove office because the office is used");
     	}
         PreparedStatement prep = null;
         Connection connection = null;
@@ -763,8 +763,8 @@ public final class OracleDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void removeWorker(BigInteger id) throws DataAccessException {
-    	if (isRemove(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID,id)) {
-    		throw new DataAccessException("Cannot remove worker becose worker has subordinate");
+    	if (canRemove(OracleDataAccessorConst.GET_WORKER_BY_MGR_ID,id)) {
+    		throw new DataAccessException("Cannot remove worker because worker has subordinate");
     	}
         PreparedStatement prep = null;
         Connection connection = null;
@@ -941,7 +941,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
              resClean(connection,prep,null);
          }
     }
-    private boolean isRemove(String command, BigInteger id) throws DataAccessException {
+    private boolean canRemove(String command, BigInteger id) throws DataAccessException {
    	 	PreparedStatement prep = null;
         Connection connection = null;
         try {
