@@ -201,7 +201,7 @@
                 </tr>   
                <tr> 
                 <td><p1>Salegrade :</p1></td>
-                <td><input name="sal" value=<%=work.getSalegrade() %> /></td> 
+                <td><input name="sal" maxlength="10" value=<%=work.getSalegrade() %> /></td> 
               </tr>
              <%
                 } else {
@@ -262,7 +262,7 @@
                 </tr> 
                 <tr> 
                 <td><p1>Salegrade :</p1></td>
-                <td><input name="sal" /></td> 
+                <td><input name="sal" maxlength="10" /></td> 
               </tr>  
              <%
                 }
