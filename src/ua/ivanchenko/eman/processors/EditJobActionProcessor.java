@@ -48,7 +48,7 @@ public class EditJobActionProcessor implements ActionProcessor {
             			IJob job = access.getJobByID(new BigInteger(req.getParameter("id")));
             			req.getSession().setAttribute("e_job", job);
             			try {
-							resp.sendRedirect("editjob.jsp?action_id=edit_job_update");
+							resp.sendRedirect("editjob.jsp?action_id=edit_job_update&id="+req.getParameter("id"));
 						} catch (IOException e) {
 							log.error("can't redirect on the editjob.jsp",e);
 						}

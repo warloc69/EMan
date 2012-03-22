@@ -65,7 +65,7 @@ public class EditOfficeActionProcessor implements ActionProcessor {
         			req.getSession().setAttribute("e_office", office);
         			req.getSession().setAttribute("info", info);
         			try {
-						resp.sendRedirect("editoffice.jsp?action_id=edit_office_update");
+						resp.sendRedirect("editoffice.jsp?action_id=edit_office_update&id="+req.getParameter("id"));
 					} catch (IOException e) {
 						log.error("can't redirect on the editjob.jsp",e);
 					}

@@ -48,7 +48,7 @@ public class EditDeptActionProcessor implements ActionProcessor {
         			IDept dept = access.getDeptByID(new BigInteger(req.getParameter("id")));
         			req.getSession().setAttribute("e_dept", dept);
         			try {
-						resp.sendRedirect("editdept.jsp?action_id=edit_dept_update");
+						resp.sendRedirect("editdept.jsp?action_id=edit_dept_update&id="+req.getParameter("id"));
 					} catch (IOException e) {
 						log.error("can't redirect on the editjob.jsp",e);
 					}
