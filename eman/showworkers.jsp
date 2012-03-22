@@ -40,17 +40,20 @@
          HashMap<BigInteger,String> managers = (HashMap<BigInteger,String>) session.getAttribute("w_manager");
          if (request.getParameter("id") != null) {
         	 if (request.getParameter("select") == null ) {%>
-	        	 <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager"> Top</a>&nbsp;>&nbsp;
+	        	 <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager"> Top</a>
 	       <%} else {%>
-                 <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true"> Top</a>&nbsp;>&nbsp;
+                 <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true"> Top</a>
            <%}
 	         if(path != null && !"search".equalsIgnoreCase(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1])) {
 	        	 if(path.size() != 0) {
 	        		 for (IWorker wor : path) {
+	        			 %> 
+	        			 &nbsp;>&nbsp;
+	        			 <% 
 	        			 if(request.getParameter("select") == null) {%>
-	        		         <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&id=<%=wor.getID()%>"><%=wor.getLastName()%></a>&nbsp;>&nbsp;
+	        		         <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&id=<%=wor.getID()%>"><%=wor.getLastName()%></a>
 	        		   <%} else {%>
-	        				 <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true&id=<%=wor.getID()%>"><%=wor.getLastName()%></a>&nbsp;>&nbsp;
+	        				 <a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true&id=<%=wor.getID()%>"><%=wor.getLastName()%></a>
 	        		   <%}
 	        		 }
 	        	 }
