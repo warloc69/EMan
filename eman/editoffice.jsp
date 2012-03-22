@@ -111,11 +111,11 @@ function trim(str) {
  }
  </script>
     <table>
-        <form name="f1" action="<%=request.getContextPath()%>/" method="post" onSubmit="return validate()">
+        <form name="f1" action="<%=request.getContextPath()%>/action" method="post" onSubmit="return validate()">
             <%
             HashMap<String,String> info = (HashMap<String,String>) request.getSession().getAttribute("info");
             IOffice office = (IOffice) request.getSession().getAttribute("e_office");
-            if("edit_office_update".equalsIgnoreCase(request.getParameter("action_id")))
+            if("edit_office_update".equalsIgnoreCase(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1]))
                 {
             %>
             <tr> 
@@ -163,7 +163,7 @@ function trim(str) {
              <tr>
                 <td><input type="submit" /></td>         
                 </form> 
-                   <form action="<%=request.getContextPath()%>/" method="get">
+                   <form action="<%=request.getContextPath()%>/action" method="get">
                        <td> 
                             <input type="hidden" name="action_id" value="view_office"/>
                             <input type="submit" value="cancel" />

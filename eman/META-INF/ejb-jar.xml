@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ejb-jar id="ejb-jar_ID" version="2.1"
+xmlns = "http://java.sun.com/xml/ns/j2ee" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/ejb-jar_2_1.xsd">	
+	<enterprise-beans>
+		<entity>		   
+		    <display-name>Department Bean</display-name>   
+		    <ejb-name>DeptBean</ejb-name> 
+		    <home>ua.ivanchenko.eman.model.ejb.dept.DeptHome</home> 
+		    <remote>ua.ivanchenko.eman.model.ejb.dept.DeptRemote</remote> 
+		    <ejb-class>ua.ivanchenko.eman.model.ejb.dept.DeptBean</ejb-class> 
+		    <persistence-type>Bean</persistence-type> 
+		    <prim-key-class>java.math.BigInteger</prim-key-class> 
+		    <reentrant>false</reentrant> 
+		</entity> 
+		<entity>
+             <display-name>Job Bean</display-name>   
+            <ejb-name>JobBean</ejb-name> 
+            <home>ua.ivanchenko.eman.model.ejb.job.JobHome</home> 
+            <remote>ua.ivanchenko.eman.model.ejb.job.JobRemote</remote> 
+            <ejb-class>ua.ivanchenko.eman.model.ejb.job.JobBean</ejb-class> 
+            <persistence-type>Bean</persistence-type> 
+            <prim-key-class>java.math.BigInteger</prim-key-class> 
+            <reentrant>false</reentrant> 
+        </entity> 
+        <entity>
+            <display-name>Office Bean</display-name>   
+            <ejb-name>OfficeBean</ejb-name> 
+            <home>ua.ivanchenko.eman.model.ejb.office.OfficeHome</home> 
+            <remote>ua.ivanchenko.eman.model.ejb.office.OfficeRemote</remote> 
+            <ejb-class>ua.ivanchenko.eman.model.ejb.office.OfficeBean</ejb-class> 
+            <persistence-type>Bean</persistence-type> 
+            <prim-key-class>java.math.BigInteger</prim-key-class> 
+            <reentrant>false</reentrant> 
+        </entity> 
+        <entity>
+            <display-name>Worker Bean</display-name>   
+            <ejb-name>WorkerBean</ejb-name> 
+            <home>ua.ivanchenko.eman.model.ejb.worker.WorkerHome</home> 
+            <remote>ua.ivanchenko.eman.model.ejb.worker.WorkerRemote</remote> 
+            <ejb-class>ua.ivanchenko.eman.model.ejb.worker.WorkerBean</ejb-class> 
+            <persistence-type>Bean</persistence-type> 
+            <prim-key-class>java.math.BigInteger</prim-key-class> 
+            <reentrant>false</reentrant> 
+        </entity> 
+	</enterprise-beans> 
+</ejb-jar>

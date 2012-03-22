@@ -85,11 +85,11 @@
     </style>
 </head>
 <body>
-    <% String path_dept = request.getContextPath()+ "/?action_id=view_dept";  %>
-    <% String path_job = request.getContextPath()+ "/?action_id=view_job";  %>
-    <% String path_office = request.getContextPath()+ "/?action_id=view_office";  %>
-    <% String path_worker = request.getContextPath()+ "/?action_id=view_worker";  %>
-    <% String path_manager = request.getContextPath()+ "/?action_id=view_top_manager";  %>
+    <% String path_dept ="/action?action_id=view_dept";  %>
+    <% String path_job ="/action?action_id=view_job";  %>
+    <% String path_office = "/action?action_id=view_office";  %>
+    <% String path_worker = "/action?action_id=view_worker";  %>
+    <% String path_manager = "/action?action_id=view_top_manager";  %>
     <% Logger log = Logger.getLogger("emanlogger"); 
     log.info("from index.jsp {URI:"+request.getRequestURI()+"}");
     if (request.getParameter("select") == null) {

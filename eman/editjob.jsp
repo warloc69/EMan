@@ -99,10 +99,10 @@ function trim(str) {
  } 
  </script>
 	<table>
-		<form name="f1" action="<%=request.getContextPath()%>/" method="post" onSubmit="return validate()" >
+		<form name="f1" action="<%=request.getContextPath()%>/action" method="post" onSubmit="return validate()" >
 		    <%
 		    IJob job = (IJob) request.getSession().getAttribute("e_job");
-		    if("edit_job_update".equalsIgnoreCase(request.getParameter("action_id")))
+		    if("edit_job_update".equalsIgnoreCase(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1]))
             {
 		    %>
 			<tr> 
@@ -136,7 +136,7 @@ function trim(str) {
 			    <td><input type="submit" /></td> 
 			  </tr>        
 		        </form> 
-			       <form action="<%=request.getContextPath()%>/" method="get">
+			       <form action="<%=request.getContextPath()%>/action" method="get">
 			           <td> 
 				            <input type="hidden" name="action_id" value="view_job"/>
 				            <input type="submit" value="cancel" />

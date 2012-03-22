@@ -24,7 +24,7 @@ public class EditOfficeActionProcessor implements ActionProcessor {
      * @throws DataAccessException when can't access to data.
      */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
-    	if("edit_office_add".equalsIgnoreCase(req.getParameter("action_id"))) {   
+    	if("edit_office_add".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1])) {   
     		if(req.getMethod().equalsIgnoreCase("GET")) {
     			try {
 					resp.sendRedirect("editoffice.jsp?action_id=edit_office_add");
@@ -51,7 +51,7 @@ public class EditOfficeActionProcessor implements ActionProcessor {
                     log.error("can't gets data from IDataAccessor",e);
                 } 
     		}
-    		} else if ("edit_office_update".equalsIgnoreCase(req.getParameter("action_id"))) {
+    		} else if ("edit_office_update".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1])) {
             	if(req.getMethod().equalsIgnoreCase("GET")) {
         			IOffice office = access.getOfficeByID(new BigInteger(req.getParameter("id")));
         			HashMap<String,String> info = new HashMap<String,String>();
@@ -90,7 +90,7 @@ public class EditOfficeActionProcessor implements ActionProcessor {
 	                    log.error("can't gets data from IDataAccessor",e);
 	                } 
         		}    
-    		} else if ("edit_office_remove".equalsIgnoreCase(req.getParameter("action_id")))  {
+    		} else if ("edit_office_remove".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1]))  {
                 try {
                 	access.removeOffice(new BigInteger(req.getParameter("id")));                    
                     resp.sendRedirect("index.jsp?action_id=view_office");                    

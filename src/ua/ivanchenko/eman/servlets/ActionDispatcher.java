@@ -33,11 +33,16 @@ public class ActionDispatcher extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+        	log.info("do get");
 			IConfig config = (IConfig) getServletContext().getAttribute("config_class");
 			IDataAccessor accessor = DataAccessor.getInstance(config);
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
-			ActionProcessor proc = apf.getProcessor(request.getParameter("action_id"),config);
-			log.info("doGet{action_id:"+request.getParameter("action_id")+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
+			ActionProcessor proc = apf.getProcessor(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1],config);
+			log.info("doGet{action_id:"+request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1]+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
+			//log.info("doGet{action_id:"+request.getParameterValues("action_id")[0] + "}");
+			//log.info("doGet{action_id:"+request.getParameterValues("action_id")[1] + "}");
+			//request.
+			log.info(" query string:"+ request.getQueryString());
 			proc.process(request, response, accessor);
 		} catch (CreateProcessorException e) {
 			log.error("can't create the processor ", e);
@@ -52,10 +57,11 @@ public class ActionDispatcher extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
+			log.info("do post");
 			IConfig config = (IConfig) getServletContext().getAttribute("config_class");
 			IDataAccessor accessor = DataAccessor.getInstance(config);
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
-			ActionProcessor proc = apf.getProcessor(request.getParameter("action_id"),config);
+			ActionProcessor proc = apf.getProcessor(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1],config);
 			proc.process(request, response, accessor);
 			log.info((String) request.getParameter("hidden"));
 		} catch (CreateProcessorException e) {

@@ -33,7 +33,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
      * @throws DataAccessException when can't access to data.
      */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
-        if("view_worker".equalsIgnoreCase(req.getParameter("action_id"))) {
+        if("view_worker".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1])) {
                 try {
                 	log.info("ViewWorkerActionPorcessor get id {id:"+req.getParameter("id")+"}");
                 	Collection<IWorker> workers  = access.getAllWorkers(null);
@@ -56,16 +56,16 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                     log.error("can't gets data from IDataAccessor",e);
                 } return;
         
-            } else if("view_top_manager".equalsIgnoreCase(req.getParameter("action_id"))) {
+            } else if("view_top_manager".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1])) {
                 try {
-                	log.info(" td ViewWorkerActionPorcessor get id { id:"+req.getParameter("id")+"} query string :" + req.getQueryString());
+                	log.info(" ViewWorkerActionPorcessor get id { id:"+req.getParameter("id")+"} query string :" + req.getQueryString());
                 	Collection<IWorker> workers = null;
                 	Collection<IWorker> allworkers = null;
                 	if (req.getParameter("sort") != null) {
-                		log.info(" td ViewWorkerActionPorcessor get mgr_id sort");
+                		log.info(" ViewWorkerActionPorcessor get mgr_id sort");
                 		allworkers  = access.getAllWorkers(req.getParameter("sort"));
                 	} else {
-                		log.info(" td ViewWorkerActionPorcessor get mgr_id not sort");
+                		log.info(" ViewWorkerActionPorcessor get mgr_id not sort");
                 		allworkers  = access.getAllWorkers(null);
                 	}
                 	IWorker wor = null;
@@ -155,7 +155,7 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 } catch (DataAccessException e) {
                     log.error("can't gets data from IDataAccessor",e);
                 } return;
-            } else if ("search".equalsIgnoreCase(req.getParameter("action_id"))) {
+            } else if ("search".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1])) {
                     try {
                     	log.info("ViewWorkerActionPorcessor get id {last_name:"+req.getParameter("id")+"}");
                         Collection<IWorker> workers = access.getWorkersByName(req.getParameter("id"));

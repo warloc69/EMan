@@ -35,5 +35,5 @@ public class OracleDataAccessorConst {
     public static final String GET_JOB_BY_TITLE = "SELECT ID,TITLE,DESCRIPTION FROM JOBS WHERE TITLE=?";
     public static final String REMOVE_JOB = "DELETE FROM JOBS WHERE ID=?";
     public static final String UPDATE_JOB = "UPDATE JOBS SET TITLE=?,DESCRIPTION=? WHERE ID=?";
-    public static final String DATA_SOURCE = "java:comp/env/jdbc/eman_oracle";
+    public static final String DATA_SOURCE = "java:/eman_oracle";
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="04b.classpath" default="war" >
+<project name="04b.classpath" default="deploy" >
 	<target name="clear">
 		<delete dir="build"/>
 	</target>
@@ -9,17 +9,41 @@
     </target>
 	<target name="compile" description="compile java" depends="make.dirs">
 		<property environment="env"/>
-        <javac destdir="build/class" 
-		classpath="lib/log4j-1.2.16.jar;${env.CATALINA_HOME}/lib/ojdbc14.jar;${env.CATALINA_HOME}/lib/servlet-api.jar">
+		<javac destdir="build/class" 
+		classpath="eman/web-inf/lib/log4j-1.2.16.jar;${env.JBOSS_DIST}/lib/ojdbc14.jar;${env.JBOSS_DIST}/common/lib/servlet-api.jar;${env.JBOSS_DIST}/client/jbossall-client.jar">
             <src path="src"/>
-        </javac>
+        </javac> 		
     </target>
-	<target name="war" description="make war" depends="compile">
+	<target name="war" description="make war" depends="jar">
+		<delete dir="build/class/ua/ivanchenko/eman/model/ejb"/>
 		<war destfile="build/eman.war" webxml="eman/WEB-INF/web.xml">
 			<classes dir="build/class"/>
-			<fileset dir="eman"/>
-			<lib dir="lib"/>
+			<fileset dir="eman">
+				<include name="config/config.properties"/> 
+				<include name="resource/*.*"/>
+				<include name="*.jsp"/>				
+			</fileset>
+			<metainf dir="eman/META-INF" includes="jboss-web.xml"/>
 		</war>
 		<delete dir="build/class"/>
 	</target>
+	<target name="jar" description="Make ejb jar" depends="compile">
+         <jar destfile="build/eman_jar.jar"> 
+		<fileset dir="build/class/"> 
+			<include name="ua/ivanchenko/eman/model/ejb/**/*.class" /> 
+			<include name="ua/ivanchenko/eman/exceptions/DataAccessException.class" /> 
+		</fileset>
+		<metainf dir="eman/META-INF" includes="ejb-jar.xml"/>
+		</jar>
+    </target>
+	<target name="deploy" depends="war">
+		<echo message="Deploying package to JBoss." />
+		<copy file="eman/META-INF/oracle-ds.xml"
+		todir="${env.JBOSS_DIST}/server/default/deploy" />
+		<copy file="build/eman_jar.jar"
+		todir="${env.JBOSS_DIST}/server/default/deploy" />
+		<copy file="build/eman.war"
+		todir="${env.JBOSS_DIST}/server/default/deploy" />
+	</target>
+
 </project>
