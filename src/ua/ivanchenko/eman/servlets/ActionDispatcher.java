@@ -38,8 +38,6 @@ public class ActionDispatcher extends HttpServlet {
 			IDataAccessor accessor = DataAccessor.getInstance(config);
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
 			ActionProcessor proc = apf.getProcessor(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1],config);
-			log.info("doGet{action_id:"+request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1]+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
-			log.info(" query string:"+ request.getQueryString());
 			proc.process(request, response, accessor);
 		} catch (CreateProcessorException e) {
 			log.error("can't create the processor ", e);
@@ -60,7 +58,6 @@ public class ActionDispatcher extends HttpServlet {
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
 			ActionProcessor proc = apf.getProcessor(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1],config);
 			proc.process(request, response, accessor);
-			log.info((String) request.getParameter("hidden"));
 		} catch (CreateProcessorException e) {
 			log.error("can't create the processor ", e);
 			response.sendRedirect("error.jsp");

@@ -14,15 +14,11 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.EntityBean;
 import javax.ejb.EntityContext;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 
 import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.EjbDataAccessorConst;
+import ua.ivanchenko.eman.model.ejb.EjbUtil;
 
 public class JobBean implements EntityBean {
 	private static final long serialVersionUID = 1L;
@@ -30,76 +26,7 @@ public class JobBean implements EntityBean {
 	private BigInteger ID;
 	private String title;
 	private String desc;
-	private EntityContext context;
-	private boolean canRemove(String command, BigInteger id) throws DataAccessException {
-	   	 	PreparedStatement prep = null;
-	        Connection connection = null;
-	        try {
-	            connection = getConnection();
-	            prep = connection.prepareStatement(command);
-	            prep.setBigDecimal(1, new BigDecimal(id));
-	            ResultSet rset = prep.executeQuery();            
-	            return rset.next();
-	        } catch (SQLException e) {
-	            log.error("Get worker by mgr id sql error",e);
-	            throw new DataAccessException("Get worker by mgr id sql error",e);
-	        } finally {
-	            resClean(connection,prep,null);
-	        }
-	   }
-    /**
-     * return new connection to the DataSource.
-     * @throws DataAccessException if class can't get access to DataSource.
-     */
-    private Connection getConnection() throws DataAccessException{
-        Connection connection = null;
-        try {
-            Context context = new InitialContext();       
-            DataSource source = (DataSource) context.lookup(EjbDataAccessorConst.DATA_SOURCE);
-            connection = source.getConnection();
-            connection.setAutoCommit(false);
-            return connection;
-        } catch (NamingException e) {
-            log.error("OracleDataAccesor context error",e);
-            throw new DataAccessException("OracleDataAccesor context error",e);
-        } catch (SQLException e1) {
-            log.error("can't get connection sql error",e1);
-            throw new DataAccessException("can't get connection sql error",e1);
-        }
-    }
-    /**
-     * Free all resource after run some method.
-     * @param con Connection's object to DataSource for clean 
-     * @param prep PreparedStatement for clean.
-     * @param rset ResultSet for clean.
-     * @throws DataAccessException if can't get access to some parameter 
-     */
-    private void resClean (Connection con, PreparedStatement prep, ResultSet rset) throws DataAccessException{
-        if(rset!=null) {
-            try {
-                rset.close();
-            } catch (SQLException e) {
-                log.error("can't close ResultSet",e);
-                throw new DataAccessException("can't close ResultSet",e);
-            }
-        }
-        if(prep!=null) {
-            try {
-                prep.close();
-            } catch (SQLException e) {
-                log.error("can't close PreparedStatemets ",e);
-                throw new DataAccessException("can't close PreparedStatemets ",e);
-            }
-        }
-        if(con!=null) {
-            try {
-                con.close();
-            } catch (SQLException e) {
-                log.error("can't close Connection",e);
-                throw new DataAccessException("can't close Connection",e);
-            }
-        }
-    }
+	private EntityContext context;	
     /**
 	  * Method returns department's identifier.
 	  */	
@@ -139,7 +66,7 @@ public class JobBean implements EntityBean {
 	        Connection connection = null;
 	        ResultSet rset = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_ID);
 	            rset = prep.executeQuery();
 	            if (rset.next()) {
@@ -156,48 +83,45 @@ public class JobBean implements EntityBean {
 	            this.desc = desc;
 	            return ID;
 	        }catch (SQLException e) {
-	            log.error("add jobs sql error",e);
+	            log.error("ejbCreate JobBean sql error",e);
 	            try {
 	                connection.rollback();
 	            } catch (SQLException e1) {
 	                log.error("can't rollback from job's table error",e);
 	                throw new EJBException("can't close Connection",e);
 	            }
-	            throw new EJBException("addjob sql error",e);
+	            throw new EJBException("ejbCreate JobBean sql error",e);
 	        } finally {
-	        	resClean(connection,prep,rset);	        	 
+	        	EjbUtil.resClean(connection,prep,rset);	        	 
 	        }
 	}
 	public void ejbRemove() {
+		 PreparedStatement prep = null;
+	     Connection connection = null;	
 		try {
-			if (canRemove(EjbDataAccessorConst.GET_WORKER_BY_JOB_ID,ID)) {
-				throw new EJBException("You can not remove job because the department is used");
-			}
-		} catch (DataAccessException e2) {
-			log.error("cannor remove dept",e2);
-		}
-        PreparedStatement prep = null;
-        Connection connection = null;
-        try {
-            connection = getConnection();
+			if (EjbUtil.canRemove(EjbDataAccessorConst.GET_WORKER_BY_JOB_ID,ID)) {
+				log.warn("try to remove job with workers who work of this job");
+				throw new EJBException("You can not remove job because the job is used");
+			}	      
+            connection = EjbUtil.getConnection();
             prep = connection.prepareStatement(EjbDataAccessorConst.REMOVE_JOB);
             prep.setBigDecimal(1, new BigDecimal(ID));
             prep.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
-            log.error("remove job sql error",e);
+            log.error("ejbRemove job sql error",e);
             try {
                 connection.rollback();
             } catch (SQLException e1) {
                 log.error("can't rollback commit from job's table",e1);
                 throw new EJBException("can't rollback commit from job's table",e1);
             }
-            throw new EJBException("remove job sql error",e);
+            throw new EJBException("ejbRemove job sql error",e);
         } catch (DataAccessException e) {
         	throw new EJBException(e);
 		} finally {
             try {
-				resClean(connection,prep,null);
+            	EjbUtil.resClean(connection,prep,null);
 			} catch (DataAccessException e) {
 				throw new EJBException(e);
 			}
@@ -207,7 +131,7 @@ public class JobBean implements EntityBean {
 		 PreparedStatement prep = null;
 	        Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.UPDATE_JOB);
 	            prep.setString(1, title);
 	            prep.setString(2, desc);
@@ -215,19 +139,19 @@ public class JobBean implements EntityBean {
 	            prep.executeUpdate();
 	            connection.commit();
 	        } catch (SQLException e) {
-	            log.error("update job sql error",e);
+	            log.error("ejbStore JobBean sql error",e);
 	            try {
 	                connection.rollback();
 	            } catch (SQLException e1) {
 	                log.error("can't rollback commit job's table",e1);
 	                throw new EJBException("can't rollback commit job's table",e1);
 	            }
-	            throw new EJBException("update job's table sql error",e);            
+	            throw new EJBException("ejbStore job's table sql error",e);            
 	        } catch (DataAccessException e) {
 	        	throw new EJBException("can't get coonection",e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					throw new EJBException(e);
 				}
@@ -241,7 +165,7 @@ public class JobBean implements EntityBean {
 		 PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_JOB_BY_ID);
 	            ID = (BigInteger) context.getPrimaryKey();
 	            prep.setBigDecimal(1, new BigDecimal(ID));
@@ -251,13 +175,13 @@ public class JobBean implements EntityBean {
 	               this.desc = rset.getString(2);
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET job by id sql error",e);
-	            throw new EJBException("GET job by id sql error",e);
+	            log.error("ejbLoad JobBean sql error",e);
+	            throw new EJBException("ejbLoad JobBean sql error",e);
 	        } catch (DataAccessException e) {
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					 throw new EJBException(e);
 				}
@@ -278,7 +202,7 @@ public class JobBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_JOB_PRIMARY_KEY_BY_ID);
 	            prep.setBigDecimal(1, new BigDecimal(id));
 	            ResultSet rset = prep.executeQuery();
@@ -286,13 +210,13 @@ public class JobBean implements EntityBean {
 	            	return id;
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET job by id sql error",e);
-	            throw new EJBException("GET job by id sql error",e);
+	            log.error("ejbFindByPrimaryKey job sql error",e);
+	            throw new EJBException("ejbFindByPrimaryKey JobBean sql error",e);
 	        } catch (DataAccessException e) {
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					 throw new EJBException(e);
 				}
@@ -303,7 +227,7 @@ public class JobBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_JOB_PRIMARY_KEY_BY_TITLE);
 	            prep.setString(1, title);
 	            ResultSet rset = prep.executeQuery();
@@ -311,13 +235,13 @@ public class JobBean implements EntityBean {
 	            	return rset.getBigDecimal(1).toBigInteger();
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET job by title sql error",e);
-	            throw new EJBException("GET job by title sql error",e);
+	            log.error("ejbFindByTitle JobBean by title sql error",e);
+	            throw new EJBException("ejbFindByTitle JobBean by title sql error",e);
 	        } catch (DataAccessException e) {
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					 throw new EJBException(e);
 				}
@@ -328,7 +252,7 @@ public class JobBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            if (sort == null) {
 	            	prep = connection.prepareStatement(EjbDataAccessorConst.GET_ALL_JOBS);
 	            } else {
@@ -342,13 +266,13 @@ public class JobBean implements EntityBean {
 	            if(ar.size()>0)
 	            	return ar;
 	        } catch (SQLException e) {
-	            log.error("GET worker sql error",e);
-	            throw new EJBException("GET worker sql error",e);
+	            log.error("ejbFindAll JobBean sql error",e);
+	            throw new EJBException("ejbFindAll JobBean sql error",e);
 	        } catch (DataAccessException e) {
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					 throw new EJBException(e);
 				}

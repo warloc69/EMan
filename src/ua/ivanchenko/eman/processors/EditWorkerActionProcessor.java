@@ -21,20 +21,16 @@ public class EditWorkerActionProcessor implements ActionProcessor {
      * @throws DataAccessException when can't access to data.
      */
     public void process(HttpServletRequest req, HttpServletResponse resp, IDataAccessor access) throws DataAccessException {
-    	log.info("edit worker action processor");
     	if("edit_worker_add".equalsIgnoreCase(req.getParameterValues("action_id")[req.getParameterValues("action_id").length-1])) {   
     		if(req.getMethod().equalsIgnoreCase("GET")) {
     			try {
-    				log.info("edit add id: "+req.getParameter("id"));
     				if(req.getParameter("id") != null){
 	    				IWorker wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
 						req.getSession().setAttribute("e_wor", wor);
     				} else {
     					req.getSession().setAttribute("e_wor",null);
     				}
-    				log.info(req.getContextPath()+"/redirect from editworker action processor (add) to editworker.jsp");
     				resp.sendRedirect("editworker.jsp?action_id=edit_worker_add");
-    			    log.info("no redirect");
 				} catch (IOException e) {
 					log.error("can't redirect on the editjob.jsp",e);
 				}

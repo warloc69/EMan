@@ -70,7 +70,41 @@ public final class EjbDataAccessor  implements IDataAccessor {
 			throw new  DataAccessException("Can't lookup WorkerBean", e);
 		}    
 	}
-    public EjbDataAccessor() {
+    private IDept copyDept(DeptRemote rem) throws RemoteException {
+    	 IDept tempDept = new Dept();
+         tempDept.setID(rem.getID());
+         tempDept.setTitle(rem.getTitle());
+         tempDept.setDescription(rem.getDescription());
+         return tempDept;
+    }
+    private IJob copyJob(JobRemote rem) throws RemoteException {
+    	IJob tempJob = new Job();
+    	  tempJob.setID(rem.getID());
+    	  tempJob.setTitle(rem.getTitle());
+    	  tempJob.setDescription(rem.getDescription());
+        return tempJob;
+   }
+    private IOffice copyOffice(OfficeRemote rem) throws RemoteException {
+    	  IOffice tempOffice = new Office();
+     	  tempOffice.setID(rem.getID());
+     	  tempOffice.setTitle(rem.getTitle());
+     	  tempOffice.setAddress(rem.getAddress());
+     	  tempOffice.setManagerID(rem.getManagerID());
+     	  return tempOffice;
+    }
+    private IWorker copyWorker (WorkerRemote rem) throws RemoteException {
+    	IWorker tempWorker = new Worker();
+    	  tempWorker.setID(rem.getID());
+    	  tempWorker.setFirstName(rem.getFirstName());
+    	  tempWorker.setLastName(rem.getLastName());
+    	  tempWorker.setDepartmentID(rem.getDepartmentID());
+    	  tempWorker.setJobID(rem.getJobID());
+    	  tempWorker.setManagerID(rem.getManagerID());
+    	  tempWorker.setOfficeID(rem.getOfficeID());
+    	  tempWorker.setSalegrade(rem.getSalegrade());
+    	  return tempWorker;
+    }
+	public EjbDataAccessor() {
     }
     /**
      * method adds department into data source.
@@ -147,12 +181,8 @@ public final class EjbDataAccessor  implements IDataAccessor {
 				deptRem = getDeptHome().findAll(sort);	
 				ArrayList<IDept> dep = new ArrayList<IDept>();
 				if (deptRem != null) {
-		            for(DeptRemote rem: deptRem) {
-		               IDept tempDept = new Dept();
-		               tempDept.setID(rem.getID());
-		               tempDept.setTitle(rem.getTitle());
-		               tempDept.setDescription(rem.getDescription());
-		               dep.add(tempDept);
+		            for(DeptRemote rem: deptRem) {		              
+		               dep.add(copyDept(rem));
 		            }
 				}
 	            return dep;
@@ -174,11 +204,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             ArrayList<IJob> job = new ArrayList<IJob>();
             if (jobRem != null) {
 	            for(JobRemote rem: jobRem) {
-	          	  IJob tempJob = new Job();
-	          	  tempJob.setID(rem.getID());
-	          	  tempJob.setTitle(rem.getTitle());
-	          	  tempJob.setDescription(rem.getDescription());
-	          	  job.add(tempJob);
+	          	  job.add(copyJob(rem));
 	            }
             }
             return job;
@@ -200,12 +226,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             ArrayList<IOffice> office = new ArrayList<IOffice>();
             if (officeRem != null) {
 	            for(OfficeRemote rem: officeRem) {
-	          	  IOffice tempOffice = new Office();
-	          	  tempOffice.setID(rem.getID());
-	          	  tempOffice.setTitle(rem.getTitle());
-	          	  tempOffice.setAddress(rem.getAddress());
-	          	  tempOffice.setManagerID(rem.getManagerID());
-	          	  office.add(tempOffice);
+	          	  office.add(copyOffice(rem));
 	            }
             }
             return office;
@@ -227,16 +248,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             if (workerRem != null) {
 	            for(WorkerRemote rem: workerRem) {
-	          	  IWorker tempWorker = new Worker();
-	          	  tempWorker.setID(rem.getID());
-	          	  tempWorker.setFirstName(rem.getFirstName());
-	          	  tempWorker.setLastName(rem.getLastName());
-	          	  tempWorker.setDepartmentID(rem.getDepartmentID());
-	          	  tempWorker.setJobID(rem.getJobID());
-	          	  tempWorker.setManagerID(rem.getManagerID());
-	          	  tempWorker.setOfficeID(rem.getOfficeID());
-	          	  tempWorker.setSalegrade(rem.getSalegrade());
-	          	  worker.add(tempWorker);
+	          	  worker.add(copyWorker(rem));
 	            }
             }
             return worker;
@@ -258,11 +270,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	if (deptRem == null) {
           		return null;
           	}
-            IDept tempDept = new Dept();
-          	tempDept.setID(deptRem.getID());
-          	tempDept.setTitle(deptRem.getTitle());
-          	tempDept.setDescription(deptRem.getDescription());
-            return tempDept;
+            return copyDept(deptRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getDeptByID) Can't get remote object DeptBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getDeptByID) Can't get remote object DeptBean", e);
@@ -281,11 +289,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             if (deptRem == null) {
           		return null;
           	}
-          	IDept tempDept = new Dept();
-          	tempDept.setID(deptRem.getID());
-          	tempDept.setTitle(deptRem.getTitle());
-          	tempDept.setDescription(deptRem.getDescription());
-            return tempDept;
+            return copyDept(deptRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getDeptByTitle) Can't get remote object DeptBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getDeptByTitle) Can't get remote object DeptBean", e);
@@ -304,11 +308,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             if (jobRem == null) {
           		return null;
           	}
-          	IJob tempJob = new Job();
-          	tempJob.setID(jobRem.getID());
-          	tempJob.setTitle(jobRem.getTitle());
-          	tempJob.setDescription(jobRem.getDescription());
-            return tempJob;
+            return copyJob(jobRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getJobByID) Can't get remote object JobBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getJobByID) Can't get remote object JobBean", e);
@@ -327,11 +327,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             if (jobRem == null) {
           		return null;
           	}
-          	IJob tempJob = new Job();
-          	tempJob.setID(jobRem.getID());
-          	tempJob.setTitle(jobRem.getTitle());
-          	tempJob.setDescription(jobRem.getDescription());
-            return tempJob;
+          	return copyJob(jobRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getJobByTitle) Can't get remote object JobBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getJobByTitle) Can't get remote object JobBean", e);
@@ -350,12 +346,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             if (officeRem == null) {
           		return null;
           	}
-          	IOffice tempOffice = new Office();
-          	tempOffice.setID(officeRem.getID());
-          	tempOffice.setTitle(officeRem.getTitle());
-          	tempOffice.setManagerID(officeRem.getManagerID());
-          	tempOffice.setAddress(officeRem.getAddress());
-            return tempOffice;
+          	return copyOffice(officeRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getOfficeByID) Can't get remote object OfficeBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getOfficeByID) Can't get remote object OfficeBean", e);
@@ -374,12 +365,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             if (officeRem == null) {
           		return null;
           	}
-          	IOffice tempOffice = new Office();
-          	tempOffice.setID(officeRem.getID());
-          	tempOffice.setTitle(officeRem.getTitle());
-          	tempOffice.setManagerID(officeRem.getManagerID());
-          	tempOffice.setAddress(officeRem.getAddress());
-            return tempOffice;
+          	return copyOffice(officeRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getOfficeByTitle) Can't get remote object OfficeBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getOfficeByTitle) Can't get remote object OfficeBean", e);
@@ -398,16 +384,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
             if (workerRem == null) {
           		return null;
           	}
-          	IWorker tempWorker = new Worker();
-          	tempWorker.setID(workerRem.getID());
-          	tempWorker.setManagerID(workerRem.getManagerID());
-          	tempWorker.setFirstName(workerRem.getFirstName());
-          	tempWorker.setLastName(workerRem.getLastName());
-          	tempWorker.setJobID(workerRem.getJobID());
-          	tempWorker.setDepartmentID(workerRem.getDepartmentID());
-          	tempWorker.setOfficeID(workerRem.getOfficeID());
-          	tempWorker.setSalegrade(workerRem.getSalegrade());
-            return tempWorker;
+            return copyWorker(workerRem);
     	} catch (RemoteException e) {
 			log.info("(EJBDataAccessor.getWorkerByID) Can't get remote object WorkerBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.getWorkerByID) Can't get remote object WorkerBean", e);
@@ -428,16 +405,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	}
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
-          	  IWorker tempWorker = new Worker();
-          	  tempWorker.setID(rem.getID());
-          	  tempWorker.setFirstName(rem.getFirstName());
-          	  tempWorker.setLastName(rem.getLastName());
-          	  tempWorker.setDepartmentID(rem.getDepartmentID());
-          	  tempWorker.setJobID(rem.getJobID());
-          	  tempWorker.setManagerID(rem.getManagerID());
-          	  tempWorker.setOfficeID(rem.getOfficeID());
-          	  tempWorker.setSalegrade(rem.getSalegrade());
-          	  worker.add(tempWorker);
+          	  worker.add(copyWorker(rem));
             }
             return worker;
     	} catch (RemoteException e) {
@@ -460,16 +428,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	}
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
-          	  IWorker tempWorker = new Worker();
-          	  tempWorker.setID(rem.getID());
-          	  tempWorker.setFirstName(rem.getFirstName());
-          	  tempWorker.setLastName(rem.getLastName());
-          	  tempWorker.setDepartmentID(rem.getDepartmentID());
-          	  tempWorker.setJobID(rem.getJobID());
-          	  tempWorker.setManagerID(rem.getManagerID());
-          	  tempWorker.setOfficeID(rem.getOfficeID());
-          	  tempWorker.setSalegrade(rem.getSalegrade());
-          	  worker.add(tempWorker);
+          	  worker.add(copyWorker(rem));
             }
             return worker;
     	} catch (RemoteException e) {
@@ -488,16 +447,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	}
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
-          	  IWorker tempWorker = new Worker();
-          	  tempWorker.setID(rem.getID());
-          	  tempWorker.setFirstName(rem.getFirstName());
-          	  tempWorker.setLastName(rem.getLastName());
-          	  tempWorker.setDepartmentID(rem.getDepartmentID());
-          	  tempWorker.setJobID(rem.getJobID());
-          	  tempWorker.setManagerID(rem.getManagerID());
-          	  tempWorker.setOfficeID(rem.getOfficeID());
-          	  tempWorker.setSalegrade(rem.getSalegrade());
-          	  worker.add(tempWorker);
+          	  worker.add(copyWorker(rem));
             }
             return worker;
     	} catch (RemoteException e) {

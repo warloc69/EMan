@@ -1,5 +1,4 @@
 package ua.ivanchenko.eman.model.ejb.worker;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -11,24 +10,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Properties;
-
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.EntityBean;
 import javax.ejb.EntityContext;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
-
 import ua.ivanchenko.eman.exceptions.DataAccessException;
 import ua.ivanchenko.eman.model.EjbDataAccessorConst;
-import ua.ivanchenko.eman.model.OracleDataAccessorConst;
+import ua.ivanchenko.eman.model.ejb.EjbUtil;
 import ua.ivanchenko.eman.processors.FiltreConst;
-
 public class WorkerBean implements EntityBean {
 	private static final long serialVersionUID = 1L;
 	private Logger log = Logger.getLogger(WorkerBean.class);
@@ -87,87 +77,18 @@ public class WorkerBean implements EntityBean {
 	public BigInteger getID() throws java.rmi.RemoteException{
 		return ID;
 	}
-	private boolean canRemove(String command, BigInteger id) throws DataAccessException {
-	   	 	PreparedStatement prep = null;
-	        Connection connection = null;
-	        try {
-	            connection = getConnection();
-	            prep = connection.prepareStatement(command);
-	            prep.setBigDecimal(1, new BigDecimal(id));
-	            ResultSet rset = prep.executeQuery();            
-	            return rset.next();
-	        } catch (SQLException e) {
-	            log.error("Get worker by mgr id sql error",e);
-	            throw new DataAccessException("Get worker by mgr id sql error",e);
-	        } finally {
-	            resClean(connection,prep,null);
-	        }
-	   }
-    /**
-     * return new connection to the DataSource.
-     * @throws DataAccessException if class can't get access to DataSource.
-     */
-    private Connection getConnection() throws DataAccessException{
-        Connection connection = null;
-        try {
-            Context context = new InitialContext();      
-            DataSource source = (DataSource) context.lookup(EjbDataAccessorConst.DATA_SOURCE);
-            connection = source.getConnection();
-            connection.setAutoCommit(false);
-            return connection;
-        } catch (NamingException e) {
-            log.error("OracleDataAccesor context error",e);
-            throw new DataAccessException("OracleDataAccesor context error",e);
-        } catch (SQLException e1) {
-            log.error("can't get connection sql error {connection = "+ connection+ "}",e1);
-            throw new DataAccessException("can't get connection sql error {connection = "+ connection+ "}",e1);
-        }
-    }
-    /**
-     * Free all resource after run some method.
-     * @param con Connection's object to DataSource for clean 
-     * @param prep PreparedStatement for clean.
-     * @param rset ResultSet for clean.
-     * @throws DataAccessException if can't get access to some parameter 
-     */
-    private void resClean (Connection con, PreparedStatement prep, ResultSet rset) throws DataAccessException{
-        if(rset!=null) {
-            try {
-                rset.close();
-            } catch (SQLException e) {
-                log.error("can't close ResultSet",e);
-                throw new DataAccessException("can't close ResultSet",e);
-            }
-        }
-        if(prep!=null) {
-            try {
-                prep.close();
-            } catch (SQLException e) {
-                log.error("can't close PreparedStatemets ",e);
-                throw new DataAccessException("can't close PreparedStatemets ",e);
-            }
-        }
-        if(con!=null) {
-            try {
-                con.close();
-            } catch (SQLException e) {
-                log.error("can't close Connection",e);
-                throw new DataAccessException("can't close Connection",e);
-            }
-        }
-    }
+	
     public void ejbPostCreate(String fname, String lname, BigInteger mgr_id, BigInteger office_id, BigInteger job_id, BigInteger dept_id, double sale) 
 			throws CreateException, DataAccessException {
     	
-    }
-	
+    }	
 	public BigInteger ejbCreate(String fname, String lname, BigInteger mgr_id, BigInteger office_id, BigInteger job_id, BigInteger dept_id, double sale) 
 				throws CreateException, DataAccessException {
 		    PreparedStatement prep = null;
 	        Connection connection = null;
 	        ResultSet rset = null;
 	        try {	
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_ID);
 	            rset = prep.executeQuery();
 	            if (rset.next()) {
@@ -198,30 +119,27 @@ public class WorkerBean implements EntityBean {
 	            this.salegrade = sale;
 	            return ID;
 	        }catch (SQLException e) {
-	            log.error("add worker sql error",e);
+	            log.error("ejbCreate WorkerBean sql error",e);
 	            try {
 	                connection.rollback();
 	            } catch (SQLException e1) {
 	                log.error("can't rollback from worker's table error",e);
-	                throw new EJBException("can't close Connection",e);
+	                throw new EJBException("can't rollback from worker's table error",e);
 	            }
-	            throw new EJBException("add worker sql error",e);
+	            throw new EJBException("ejbCreate WorkerBean sql error",e);
 	        } finally {
-	        	resClean(connection,prep,rset);	        	 
+	        	EjbUtil.resClean(connection,prep,rset);	        	 
 	        }
 	}
 	public void ejbRemove() throws java.rmi.RemoteException{
+		 PreparedStatement prep = null;
+	     Connection connection = null;
 		try {
-			if (canRemove(EjbDataAccessorConst.GET_WORKER_BY_MGR_ID,ID)) {
-				throw new EJBException("You can not remove worker because the office is used");
+			if (EjbUtil.canRemove(EjbDataAccessorConst.GET_WORKER_BY_MGR_ID,ID)) {
+				log.warn("You can not remove worker because worker has subordinates");
+				throw new EJBException("You can not remove worker because worker has subordinates");
 			}
-		} catch (DataAccessException e2) {
-			log.error("cannot remove worker",e2);
-		}
-        PreparedStatement prep = null;
-        Connection connection = null;
-        try {
-            connection = getConnection();
+            connection = EjbUtil.getConnection();
             prep = connection.prepareStatement(EjbDataAccessorConst.REMOVE_WORKER);
             prep.setBigDecimal(1, new BigDecimal(ID));
             prep.executeUpdate();
@@ -234,13 +152,13 @@ public class WorkerBean implements EntityBean {
                 log.error("can't rollback commit from worker's table",e1);
                 throw new EJBException("can't rollback commit from worker's table",e1);
             }
-            throw new EJBException("remove worker sql error",e);
+            throw new EJBException("ejbRemove WorkerBean sql error",e);
         } catch (DataAccessException e) {
         	log.error("ejbRemove id= "+ID,e);
         	throw new EJBException(e);
 		} finally {
             try {
-				resClean(connection,prep,null);
+            	EjbUtil.resClean(connection,prep,null);
 			} catch (DataAccessException e) {
 				log.error("ejbRemove id= "+ID,e);
 				throw new EJBException(e);
@@ -251,7 +169,7 @@ public class WorkerBean implements EntityBean {
 		 PreparedStatement prep = null;
 	        Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.UPDATE_WORKER);
 	            prep.setString(1, this.fname);
 	            prep.setString(2, this.lname);
@@ -268,7 +186,7 @@ public class WorkerBean implements EntityBean {
 	            prep.executeUpdate();
 	            connection.commit();
 	        } catch (SQLException e) {
-	            log.error("update worker sql error",e);
+	            log.error("ejbStore WorkerBean sql error",e);
 	            try {
 	                connection.rollback();
 	            } catch (SQLException e1) {
@@ -281,7 +199,7 @@ public class WorkerBean implements EntityBean {
 	        	throw new EJBException("can't get conection",e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					log.error("EjbStore id= "+ID,e);
 					throw new EJBException(e);
@@ -297,7 +215,7 @@ public class WorkerBean implements EntityBean {
 		 PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_WORKER_BY_ID);
 	            prep.setBigDecimal(1, new BigDecimal(ID));
 	            ResultSet rset = prep.executeQuery();
@@ -322,7 +240,7 @@ public class WorkerBean implements EntityBean {
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					log.error("EjbLoad res clin error id= "+ID,e);
 					throw new EJBException(e);
@@ -350,7 +268,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_WORKER_PRIMARY_KEY_BY_ID);
 	            prep.setBigDecimal(1, new BigDecimal(id));
 	            ResultSet rset = prep.executeQuery();
@@ -358,16 +276,16 @@ public class WorkerBean implements EntityBean {
 	            	return id;
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET worker by id sql error",e);
-	            throw new EJBException("GET worker by id sql error",e);
+	            log.error("ejbFindByPrimaryKey WorkerBean sql error",e);
+	            throw new EJBException("ejbFindByPrimaryKey WorkerBean sql error",e);
 	        } catch (DataAccessException e) {
-	        	log.error("ejbFindbyId id= "+ID,e);
+	        	 log.error("ejbFindByPrimaryKey id= "+ID,e);
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
-					log.error("ejbFindById id= "+ID,e);
+					log.error("ejbFindByPrimaryKey id= "+ID,e);
 					 throw new EJBException(e);
 				}
 	        }
@@ -377,7 +295,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_WORKER_PRIMARY_KEY_BY_NAME);
 	            prep.setString(1, name);
 	            prep.setString(2, name);
@@ -390,16 +308,16 @@ public class WorkerBean implements EntityBean {
 	            	return ar;
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET worker by id sql error",e);
-	            throw new EJBException("GET worker by id sql error",e);
+	            log.error("ejbFindByName WorkerBean sql error",e);
+	            throw new EJBException("ejbFindByName WorkerBean  sql error",e);
 	        } catch (DataAccessException e) {
-	        	log.error("EjbFindByName id= "+ID,e);
+	        	log.error("EjbFindByName name= "+name,e);
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
-					log.error("ejbFindByName id= "+ID,e);
+					log.error("ejbFindByName name= "+name,e);
 					 throw new EJBException(e);
 				}
 	        }
@@ -409,7 +327,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_WORKER_PRIMARY_KEY_BY_MGR_ID);
 	            prep.setBigDecimal(1, new BigDecimal(id));
 	            ResultSet rset = prep.executeQuery();
@@ -421,16 +339,16 @@ public class WorkerBean implements EntityBean {
 	            	return ar;
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET worker by id sql error",e);
-	            throw new EJBException("GET worker by id sql error",e);
+	            log.error("ejbFindByManagerID WorkerBean by manager id sql error",e);
+	            throw new EJBException("ejbFindByManagerID WorkerBean by manager id sql error",e);
 	        } catch (DataAccessException e) {
-	        	log.error("EjbFindByMgr id= "+ID,e);
+	        	log.error("ejbFindByManagerID WorkerBean by manager id = "+id,e);
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
-					log.error("ejbFindbyMgr id= "+ID,e);
+					log.error("ejbFindByManagerID WorkerBean by manager id id= "+ID,e);
 					 throw new EJBException(e);
 				}
 	        }
@@ -440,7 +358,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            if (sort == null) {
 	            	prep = connection.prepareStatement(EjbDataAccessorConst.GET_ALL_WORKERS_PRIMARY_KEY);
 	            } else {
@@ -456,16 +374,15 @@ public class WorkerBean implements EntityBean {
 	            	return ar;
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET worker sql error",e);
-	            throw new EJBException("GET worker sql error",e);
+	            log.error("ejbFindAll WorkerBeans sql error",e);
+	            throw new EJBException("ejbFindAll WorkerBean sql error",e);
 	        } catch (DataAccessException e) {
-	        	log.error("ejbFind all id= "+ID,e);
+	        	log.error("ejbFindAll WorkerBean id= "+ID,e);
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
-					log.error("ejbFind all id= "+ID,e);
 					 throw new EJBException(e);
 				}
 	        }
@@ -475,7 +392,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            if (sort == null) {
 	            	prep = connection.prepareStatement(EjbDataAccessorConst.GET_TOP_MANAGER_PRIMARY_KEY);
 	            } else {
@@ -488,16 +405,15 @@ public class WorkerBean implements EntityBean {
 	            }
 	             return ar;
 	        } catch (SQLException e) {
-	            log.error("GET worker sql error",e);
-	            throw new EJBException("GET worker sql error",e);
+	            log.error("ejbFindTopManager WorkerBean sql error",e);
+	            throw new EJBException("ejbFindTopManager WorkerBean sql error",e);
 	        } catch (DataAccessException e) {
 	        	log.error("ejbFindTopManager id= "+ID,e);
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
-					log.error("EjbFindbyTopmanager id= "+ID,e);
 					 throw new EJBException(e);
 				}
 	        }
@@ -506,7 +422,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
-	            connection = getConnection();
+	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_PATH);
 	            prep.setBigDecimal(1, new BigDecimal(id));
 	            ResultSet rset = prep.executeQuery();
@@ -518,14 +434,14 @@ public class WorkerBean implements EntityBean {
 	            	return ar;
 	            }
 	        } catch (SQLException e) {
-	            log.error("GET worker sql error",e);
-	            throw new EJBException("GET worker sql error",e);
+	            log.error("ejbFindPath sql error",e);
+	            throw new EJBException("ejbFindPath  sql error",e);
 	        } catch (DataAccessException e) {
-	        	log.error("ejbFind Path id= "+ID,e);
+	        	log.error("ejbFindPath id= "+ID,e);
 	        	 throw new EJBException(e);
 			} finally {
 	            try {
-					resClean(connection,prep,null);
+	            	EjbUtil.resClean(connection,prep,null);
 				} catch (DataAccessException e) {
 					log.error("ejbFindPath id= "+ID,e);
 					 throw new EJBException(e);
@@ -537,7 +453,7 @@ public class WorkerBean implements EntityBean {
 		PreparedStatement prep = null;
         Connection connection = null;
         try {
-        	connection = getConnection();
+        	connection = EjbUtil.getConnection();
             StringBuffer sb = new StringBuffer();
             sb.append("select employees.ID from employees ");
             String job = filters.get(FiltreConst.job);
@@ -636,17 +552,17 @@ public class WorkerBean implements EntityBean {
             log.info(ls);
             return ls;
         } catch (SQLException e) {
-            log.error("Get worker by mgr id sql error",e);
-            throw new EJBException("Get worker by mgr id sql error",e);
+            log.error("ejbFilteringWorker  sql error",e);
+            throw new EJBException("ejbFilteringWorker sql error",e);
         } catch (DataAccessException e) {
-        	log.error("Ejb filtre id= "+ID,e);
-        	throw new EJBException("Get worker by mgr id sql error",e);
+        	log.error("ejbFilteringWorker filtre id= "+ID,e);
+        	throw new EJBException("ejbFilteringWorker sql error",e);
 		} finally {
             try {
-				resClean(connection,prep,null);
+            	EjbUtil.resClean(connection,prep,null);
 			} catch (DataAccessException e) {
-				log.error("ejb Filtre id= "+ID,e);
-				throw new EJBException("Get worker by mgr id sql error",e);
+				log.error("ejbFilteringWorker id= "+ID,e);
+				throw new EJBException("ejbFilteringWorker sql error",e);
 			}
         }
 	}
