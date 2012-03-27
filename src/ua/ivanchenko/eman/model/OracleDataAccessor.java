@@ -30,16 +30,6 @@ import ua.ivanchenko.eman.processors.FiltreConst;
 
 public final class OracleDataAccessor  implements IDataAccessor {
 	private Logger log = Logger.getLogger("emanlogger");
-	public static Context createJBossContext()   throws NamingException  { 
-		Properties p = new Properties(); 
-		p.put("java.naming.factory.initial",
-		"org.jnp.interfaces.NamingContextFactory"); 
-		p.put("java.naming.provider.url", "jnp://127.0.0.1:1099"); 
-		p.put("java.naming.factory.url.pkgs",
-		"org.jboss.naming:org.jnp.interfaces");
-		Context jndiContext = new InitialContext(p);
-		return jndiContext;
-	}
 
     /**
      * return new connection to the DataSource.
@@ -48,7 +38,7 @@ public final class OracleDataAccessor  implements IDataAccessor {
     private Connection getConnection() throws DataAccessException{
         Connection connection = null;
         try {
-            Context context = createJBossContext();       
+            Context context = new InitialContext();       
             DataSource source = (DataSource) context.lookup(OracleDataAccessorConst.DATA_SOURCE);
             connection = source.getConnection();
             connection.setAutoCommit(false);

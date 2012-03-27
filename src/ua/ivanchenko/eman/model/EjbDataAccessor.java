@@ -4,10 +4,16 @@
 package ua.ivanchenko.eman.model;
 
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+import javax.ejb.RemoveException;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 
@@ -24,6 +30,46 @@ import ua.ivanchenko.eman.model.ejb.worker.WorkerRemote;
 
 public final class EjbDataAccessor  implements IDataAccessor {
 	private Logger log = Logger.getLogger(EjbDataAccessor.class);
+	private DeptHome getDeptHome() throws DataAccessException {
+		try { 
+			javax.naming.Context initial = new javax.naming.InitialContext();
+	        Object objRef = initial.lookup("DeptBean");
+	        return (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class); 
+		} catch (NamingException e) {
+			log.info("Can't lookup DeptBean",e);
+			throw new  DataAccessException("Can't lookup DeptBean", e);
+		}
+	}
+	private JobHome getJobHome()  throws DataAccessException {
+		try {
+			javax.naming.Context initial = new javax.naming.InitialContext();
+	        Object objRef = initial.lookup("JobBean");
+	        return (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
+		} catch (NamingException e) {
+			log.info("Can't lookup JobBean",e);
+			throw new  DataAccessException("Can't lookup JobBean", e);
+		}
+	}
+	private OfficeHome getOfficeHome()  throws DataAccessException {
+		try {
+			javax.naming.Context initial = new javax.naming.InitialContext();
+            Object objRef = initial.lookup("OfficeBean");
+            return (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
+		}  catch (NamingException e) {
+			log.info("Can't lookup OfficeBean",e);
+			throw new  DataAccessException("Can't lookup OfficeBean", e);
+		}
+	}
+	private WorkerHome getWorkerHome() throws DataAccessException {
+		try {
+			javax.naming.Context initial = new javax.naming.InitialContext();
+	        Object objRef = initial.lookup("WorkerBean");
+	        return (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);	
+		}  catch (NamingException e) {
+			log.info("Can't lookup WorkerBean",e);
+			throw new  DataAccessException("Can't lookup WorkerBean", e);
+		}    
+	}
     public EjbDataAccessor() {
     }
     /**
@@ -31,16 +77,16 @@ public final class EjbDataAccessor  implements IDataAccessor {
      * @param dept adder department
      * @throws DataAccessException if got data source error.
      */
-    public void addDept(IDept dept) throws DataAccessException {
-        try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("DeptBean");
-            DeptHome deptHome = (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class);
-            deptHome.create(dept.getTitle(), dept.getDescription());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    public void addDept(IDept dept) throws DataAccessException {        
+            try {
+				getDeptHome().create(dept.getTitle(), dept.getDescription());
+			} catch (RemoteException e) {
+				log.info("(EJBDataAccessor.addDept) Can't get remote object",e);
+				throw new  DataAccessException("(EJBDataAccessor.addDept) Can't get remote object", e);
+			} catch (CreateException e) {
+				log.info("(EJBDataAccessor.addDept) Can't create DeptBean object",e);
+				throw new  DataAccessException("(EJBDataAccessor.addDept) Can't create DeptBean object", e);
+			}
     }
     /**
      * method add job into data source.
@@ -49,14 +95,14 @@ public final class EjbDataAccessor  implements IDataAccessor {
      */
     public void addJob(IJob job) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("JobBean");
-            JobHome jobHome = (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
-            jobHome.create(job.getTitle(), job.getDescription());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+            getJobHome().create(job.getTitle(), job.getDescription());
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.addJob) Can't get remote object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addJob) Can't get remote object", e);
+		} catch (CreateException e) {
+			log.info("(EJBDataAccessor.addJob) Can't create JobBean object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addJob) Can't create JobBean object", e);
+		}
     }
     /**
     * method add office into data source.
@@ -64,15 +110,15 @@ public final class EjbDataAccessor  implements IDataAccessor {
     * @throws DataAccessException if got data source error.
     */
     public void addOffice(IOffice off) throws DataAccessException {
-    	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("OfficeBean");
-            OfficeHome officeHome = (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
-            officeHome.create(off.getTitle(), off.getAddress(), off.getManagerID());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	try {        	
+            getOfficeHome().create(off.getTitle(), off.getAddress(), off.getManagerID());
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.addOffice) Can't get remote object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addOffice) Can't get remote object", e);
+		} catch (CreateException e) {
+			log.info("(EJBDataAccessor.addOffice) Can't create OfficeBean object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addOffice) Can't create OfficeBean object", e);
+		}
     }
     /**
      * method add worker into data source.
@@ -80,40 +126,41 @@ public final class EjbDataAccessor  implements IDataAccessor {
      * @throws DataAccessException if got data source error.
      */
     public void addWorker(IWorker worker) throws DataAccessException {
-    	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            workerHome.create(worker.getFirstName(), worker.getLastName(), worker.getManagerID(),worker.getOfficeID(),
+    	try {        	
+            getWorkerHome().create(worker.getFirstName(), worker.getLastName(), worker.getManagerID(),worker.getOfficeID(),
             		worker.getJobID(),worker.getDepartmentID(),worker.getSalegrade());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.addWorker) Can't get remote object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addWorker) Can't get remote object", e);
+		} catch (CreateException e) {
+			log.info("(EJBDataAccessor.addWorker) Can't create WorkerBean object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addWorker) Can't create WorkerBean object", e);
+		}
     }
     /**
     * return collection contain all departments
     * @throws DataAccessException if got data source error.
     */
     public Collection<IDept> getAllDepts(String sort) throws DataAccessException {
-    	  try {
-          	  javax.naming.Context initial = new javax.naming.InitialContext();
-              Object objRef = initial.lookup("DeptBean");
-              DeptHome deptHome = (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class);
-              Collection<DeptRemote> deptRem = deptHome.findAll(sort);
-              ArrayList<IDept> dep = new ArrayList<IDept>();
-              for(DeptRemote rem: deptRem) {
-            	  IDept tempDept = new Dept();
-            	  tempDept.setID(rem.getID());
-            	  tempDept.setTitle(rem.getTitle());
-            	  tempDept.setDescription(rem.getDescription());
-            	  dep.add(tempDept);
-              }
-              return dep;
-          } catch (Exception e) {
-          	log.error(e);
-              throw new DataAccessException(e);
-          }
+              Collection<DeptRemote> deptRem;
+			try {
+				deptRem = getDeptHome().findAll(sort);			
+				ArrayList<IDept> dep = new ArrayList<IDept>();
+	            for(DeptRemote rem: deptRem) {
+	               IDept tempDept = new Dept();
+	               tempDept.setID(rem.getID());
+	               tempDept.setTitle(rem.getTitle());
+	               tempDept.setDescription(rem.getDescription());
+	               dep.add(tempDept);
+	            }
+	            return dep;
+			} catch (RemoteException e) {
+				log.info("(EJBDataAccessor.getAllDepts) Can't get remote object DeptBean",e);
+				throw new  DataAccessException("(EJBDataAccessor.getAllDepts) Can't get remote object DeptBean", e);
+			} catch (FinderException e) {
+				log.info("(EJBDataAccessor.getAllDepts) Can't find remote object DeptBean",e);
+				throw new  DataAccessException("(EJBDataAccessor.getAllDepts) Can't find remote object DeptBean", e);
+			}
     }
     /**
     * return collection contain all jobs
@@ -121,10 +168,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public Collection<IJob> getAllJobs(String sort) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("JobBean");
-            JobHome jobHome = (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
-            Collection<JobRemote> jobRem = jobHome.findAll(sort);
+            Collection<JobRemote> jobRem = getJobHome().findAll(sort);
             ArrayList<IJob> job = new ArrayList<IJob>();
             for(JobRemote rem: jobRem) {
           	  IJob tempJob = new Job();
@@ -134,10 +178,13 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  job.add(tempJob);
             }
             return job;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.addJob) Can't get remote object",e);
+			throw new  DataAccessException("(EJBDataAccessor.addJob) Can't get remote object", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.addJob) Can't find remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.addJob) Can't find remote object JobBean", e);
+		}
     }
     /**
     * return collection contain all offices
@@ -145,10 +192,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public Collection<IOffice> getAllOffices(String sort) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("OfficeBean");
-            OfficeHome officeHome = (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
-            Collection<OfficeRemote> officeRem = officeHome.findAll(sort);
+            Collection<OfficeRemote> officeRem = getOfficeHome().findAll(sort);
             ArrayList<IOffice> office = new ArrayList<IOffice>();
             for(OfficeRemote rem: officeRem) {
           	  IOffice tempOffice = new Office();
@@ -159,10 +203,13 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  office.add(tempOffice);
             }
             return office;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getAllOffices) Can't get remote object",e);
+			throw new  DataAccessException("(EJBDataAccessor.getAllOffices) Can't get remote object", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getAllOffices) Can't find remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getAllOffices) Can't find remote object OfficeBean", e);
+		}
     }
     /**
     * return collection contain all workers
@@ -170,10 +217,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public Collection<IWorker> getAllWorkers(String sort) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);  
-            Collection<WorkerRemote> workerRem = workerHome.findAll(sort);
+            Collection<WorkerRemote> workerRem = getWorkerHome().findAll(sort);
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -188,10 +232,13 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  worker.add(tempWorker);
             }
             return worker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getAllWorkers) Can't get remote object",e);
+			throw new  DataAccessException("(EJBDataAccessor.getAllWorkers) Can't get remote object", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getAllWorkers) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getAllWorkers) Can't find remote object WorkerBean", e);
+		}
     }
     /**
     * Method returns department by identifier.
@@ -199,19 +246,19 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IDept getDeptByID(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("DeptBean");
-            DeptHome deptHome = (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class);
-            DeptRemote deptRem = deptHome.findByPrimaryKey(id);
+            DeptRemote deptRem = getDeptHome().findByPrimaryKey(id);
           	IDept tempDept = new Dept();
           	tempDept.setID(deptRem.getID());
           	tempDept.setTitle(deptRem.getTitle());
           	tempDept.setDescription(deptRem.getDescription());
             return tempDept;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getDeptByID) Can't get remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getDeptByID) Can't get remote object DeptBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getDeptByID) Can't find remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getDeptByID) Can't find remote object DeptBean", e);
+		}
     }
     /**
     * Method returns department by title.
@@ -219,19 +266,19 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IDept getDeptByTitle(String title) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("DeptBean");
-            DeptHome deptHome = (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class);
-            DeptRemote deptRem = deptHome.findByTitle(title);
+            DeptRemote deptRem = getDeptHome().findByTitle(title);
           	IDept tempDept = new Dept();
           	tempDept.setID(deptRem.getID());
           	tempDept.setTitle(deptRem.getTitle());
           	tempDept.setDescription(deptRem.getDescription());
             return tempDept;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getDeptByTitle) Can't get remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getDeptByTitle) Can't get remote object DeptBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getDeptByTitle) Can't find remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getDeptByTitle) Can't find remote object DeptBean", e);
+		}
     }
     /**
     * Method returns job by identifier.
@@ -239,19 +286,19 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IJob getJobByID(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("JobBean");
-            JobHome jobHome = (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
-            JobRemote jobRem = jobHome.findByPrimaryKey(id);
+            JobRemote jobRem = getJobHome().findByPrimaryKey(id);
           	IJob tempJob = new Job();
           	tempJob.setID(jobRem.getID());
           	tempJob.setTitle(jobRem.getTitle());
           	tempJob.setDescription(jobRem.getDescription());
             return tempJob;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getJobByID) Can't get remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getJobByID) Can't get remote object JobBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getJobByID) Can't find remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getJobByID) Can't find remote object JobBean", e);
+		}
     }
     /**
     * Method returns job by title.
@@ -259,19 +306,19 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IJob getJobByTitle(String title) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("JobBean");
-            JobHome jobHome = (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
-            JobRemote jobRem = jobHome.findByTitle(title);
+            JobRemote jobRem = getJobHome().findByTitle(title);
           	IJob tempJob = new Job();
           	tempJob.setID(jobRem.getID());
           	tempJob.setTitle(jobRem.getTitle());
           	tempJob.setDescription(jobRem.getDescription());
             return tempJob;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getJobByTitle) Can't get remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getJobByTitle) Can't get remote object JobBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getJobByTitle) Can't find remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getJobByTitle) Can't find remote object JobBean", e);
+		}
     }
     /**
     * Method returns office by identifier.
@@ -279,20 +326,20 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IOffice getOfficeByID(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("OfficeBean");
-            OfficeHome officeHome = (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
-            OfficeRemote officeRem = officeHome.findByPrimaryKey(id);
+            OfficeRemote officeRem = getOfficeHome().findByPrimaryKey(id);
           	IOffice tempOffice = new Office();
           	tempOffice.setID(officeRem.getID());
           	tempOffice.setTitle(officeRem.getTitle());
           	tempOffice.setManagerID(officeRem.getManagerID());
           	tempOffice.setAddress(officeRem.getAddress());
             return tempOffice;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getOfficeByID) Can't get remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getOfficeByID) Can't get remote object OfficeBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getOfficeByID) Can't find remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getOfficeByID) Can't find remote object OfficeBean", e);
+		}
     }
     /**
     * Method returns office by title.
@@ -300,20 +347,20 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IOffice getOfficeByTitle(String title) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("OfficeBean");
-            OfficeHome officeHome = (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
-            OfficeRemote officeRem = officeHome.findByTitle(title);
+            OfficeRemote officeRem = getOfficeHome().findByTitle(title);
           	IOffice tempOffice = new Office();
           	tempOffice.setID(officeRem.getID());
           	tempOffice.setTitle(officeRem.getTitle());
           	tempOffice.setManagerID(officeRem.getManagerID());
           	tempOffice.setAddress(officeRem.getAddress());
             return tempOffice;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getOfficeByTitle) Can't get remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getOfficeByTitle) Can't get remote object OfficeBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getOfficeByTitle) Can't find remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getOfficeByTitle) Can't find remote object OfficeBean", e);
+		}
     }
     /**
     * Method returns worker by identifier.
@@ -321,10 +368,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public IWorker getWorkerByID(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            WorkerRemote workerRem = workerHome.findByPrimaryKey(id);
+            WorkerRemote workerRem = getWorkerHome().findByPrimaryKey(id);
           	IWorker tempWorker = new Worker();
           	tempWorker.setID(workerRem.getID());
           	tempWorker.setManagerID(workerRem.getManagerID());
@@ -335,10 +379,13 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	tempWorker.setOfficeID(workerRem.getOfficeID());
           	tempWorker.setSalegrade(workerRem.getSalegrade());
             return tempWorker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getWorkerByID) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getWorkerByID) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getWorkerByID) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getWorkerByID) Can't find remote object WorkerBean", e);
+		}
     }
     /**
     * Method returns worker by last name.
@@ -346,10 +393,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public Collection<IWorker> getWorkersByName(String lname) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            Collection<WorkerRemote> workerRem = workerHome.findByName(lname);
+            Collection<WorkerRemote> workerRem = getWorkerHome().findByName(lname);
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -364,10 +408,13 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  worker.add(tempWorker);
             }
             return worker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getWorkersByName) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getWorkersByName) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getWorkersByName) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getWorkersByName) Can't find remote object WorkerBean", e);
+		}
     }
     /**
     * Method returns worker by identifier.
@@ -375,10 +422,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public Collection<IWorker> getWorkersByMgrID(BigInteger id, String sort) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            Collection<WorkerRemote> workerRem = workerHome.findByManagerID(id);
+            Collection<WorkerRemote> workerRem = getWorkerHome().findByManagerID(id);
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -393,17 +437,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  worker.add(tempWorker);
             }
             return worker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getWorkersByMgrID) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getWorkersByMgrID) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getWorkersByMgrID) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getWorkersByMgrID) Can't find remote object WorkerBean", e);
+		}
     }
     public Collection<IWorker> getTopManagers(String sort) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            Collection<WorkerRemote> workerRem = workerHome.findTopManager(sort);
+            Collection<WorkerRemote> workerRem = getWorkerHome().findTopManager(sort);
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -418,10 +462,13 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  worker.add(tempWorker);
             }
             return worker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getTopManagers) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getTopManagers) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getTopManagers) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getTopManagers) Can't find remote object WorkerBean", e);
+		}
     }
     /**
     * method remove department from data source.
@@ -430,14 +477,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeDept(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("DeptBean");
-            DeptHome deptHome = (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class);
-            deptHome.findByPrimaryKey(id).remove();
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+			getDeptHome().findByPrimaryKey(id).remove();
+		} catch (RemoveException e) {
+			log.info("(EJBDataAccessor.removeDept) Can't remove object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeDept) Can't remove remote object DeptBean", e);	
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.removeDept) Can't get remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeDept) Can't get remote object DeptBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.removeDept) Can't find remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeDept) Can't find remote object DeptBean", e);
+		}
     }
     /**
     * method remove job from data source.
@@ -446,15 +496,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeJob(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("JobBean");
-            JobHome jobHome = (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
-            jobHome.findByPrimaryKey(id).remove();
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
-
+            getJobHome().findByPrimaryKey(id).remove();
+    	} catch (RemoveException e) {
+			log.info("(EJBDataAccessor.removeJob) Can't remove object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeJob) Can't remove remote object JobBean", e);	
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.removeJob) Can't get remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeJob) Can't get remote object JobBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.removeJob) Can't find remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeJob) Can't find remote object JobBean", e);
+		}
     }
     /**
     * method remove office from data source.
@@ -463,14 +515,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeOffice(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("OfficeBean");
-            OfficeHome officeHome = (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
-            officeHome.findByPrimaryKey(id).remove();
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+            getOfficeHome().findByPrimaryKey(id).remove();
+    	} catch (RemoveException e) {
+			log.info("(EJBDataAccessor.removeOffice) Can't remove object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeOffice) Can't remove remote object OfficeBean", e);	
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.removeOffice) Can't get remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeOffice) Can't get remote object OfficeBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.removeOffice) Can't find remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeOffice) Can't find remote object OfficeBean", e);
+		}
     }
     /**
     * method remove worker from data source.
@@ -479,14 +534,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeWorker(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            workerHome.findByPrimaryKey(id).remove();
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+            getWorkerHome().findByPrimaryKey(id).remove();
+    	} catch (RemoveException e) {
+			log.info("(EJBDataAccessor.removeWorker) Can't remove object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeWorker) Can't remove remote object WorkerBean", e);	
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.removeWorker) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeWorker) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.removeWorker) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.removeWorker) Can't find remote object WorkerBean", e);
+		}
     }
     /**
     * method update department in the data source.
@@ -495,16 +553,16 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void updateDept(IDept dept) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("DeptBean");
-            DeptHome deptHome = (DeptHome) javax.rmi.PortableRemoteObject.narrow(objRef, DeptHome.class);
-            DeptRemote deptRem = deptHome.findByPrimaryKey(dept.getID());
+            DeptRemote deptRem = getDeptHome().findByPrimaryKey(dept.getID());
             deptRem.setTitle(dept.getTitle());
             deptRem.setDescription(dept.getDescription());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.updateDept) Can't get remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateDept) Can't get remote object DeptBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.updateDept) Can't find remote object DeptBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateDept) Can't find remote object DeptBean", e);
+		}
     }
     /**
      * method update job in the data source.
@@ -513,16 +571,16 @@ public final class EjbDataAccessor  implements IDataAccessor {
      */
     public void updateJob(IJob job) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("JobBean");
-            JobHome jobHome = (JobHome) javax.rmi.PortableRemoteObject.narrow(objRef, JobHome.class);
-            JobRemote jobRem = jobHome.findByPrimaryKey(job.getID());
+            JobRemote jobRem = getJobHome().findByPrimaryKey(job.getID());
             jobRem.setTitle(job.getTitle());
             jobRem.setDescription(job.getDescription());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.updateJob) Can't get remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateJob) Can't get remote object JobBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.updateJob) Can't find remote object JobBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateJob) Can't find remote object JobBean", e);
+		}
     }
     /**
      * method update office in the data source.
@@ -531,17 +589,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
      */
     public void updateOffice(IOffice off) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("OfficeBean");
-            OfficeHome officeHome = (OfficeHome) javax.rmi.PortableRemoteObject.narrow(objRef, OfficeHome.class);
-            OfficeRemote officeRem = officeHome.findByPrimaryKey(off.getID());
+            OfficeRemote officeRem = getOfficeHome().findByPrimaryKey(off.getID());
             officeRem.setTitle(off.getTitle());
             officeRem.setAddress(off.getAddress());
             officeRem.setManagerID(off.getManagerID());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.updateOffice) Can't get remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateOffice) Can't get remote object OfficeBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.updateOffice) Can't find remote object OfficeBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateOffice) Can't find remote object OfficeBean", e);
+		}
     }
     /**
      * method update worker in the data source.
@@ -550,10 +608,7 @@ public final class EjbDataAccessor  implements IDataAccessor {
      */
     public void updateWorker(IWorker worker) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            WorkerRemote workerRem = workerHome.findByPrimaryKey(worker.getID());
+            WorkerRemote workerRem = getWorkerHome().findByPrimaryKey(worker.getID());
             workerRem.setFirstName(worker.getFirstName());
             workerRem.setLastName(worker.getLastName());
             workerRem.setDepartmentID(worker.getDepartmentID());
@@ -561,17 +616,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
             workerRem.setManagerID(worker.getManagerID());
             workerRem.setOfficeID(worker.getOfficeID());
             workerRem.setSalegrade(worker.getSalegrade());
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.updateWorker) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateWorker) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.updateWorker) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.updateWorker) Can't find remote object WorkerBean", e);
+		}
     }
     public Collection<IWorker> getPath(BigInteger id) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            Collection<WorkerRemote> workerRem = workerHome.findPath(id);
+            Collection<WorkerRemote> workerRem = getWorkerHome().findPath(id);
             LinkedList<IWorker> worker = new LinkedList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -580,17 +635,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  worker.add(tempWorker);
             }
             return worker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.getPath) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getPath) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.getPath) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.getPath) Can't find remote object WorkerBean", e);
+		}
     }
     public Collection<IWorker> filteringWorker(BigInteger id, HashMap<String,String> filters) throws DataAccessException {
     	try {
-        	javax.naming.Context initial = new javax.naming.InitialContext();
-            Object objRef = initial.lookup("WorkerBean");
-            WorkerHome workerHome = (WorkerHome) javax.rmi.PortableRemoteObject.narrow(objRef, WorkerHome.class);
-            Collection<WorkerRemote> workerRem = workerHome.findFilteringWorker(id, filters);
+            Collection<WorkerRemote> workerRem = getWorkerHome().findFilteringWorker(id, filters);
             LinkedList<IWorker> worker = new LinkedList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -605,9 +660,12 @@ public final class EjbDataAccessor  implements IDataAccessor {
           	  worker.add(tempWorker);
             }
             return worker;
-        } catch (Exception e) {
-        	log.error(e);
-            throw new DataAccessException(e);
-        }
+    	} catch (RemoteException e) {
+			log.info("(EJBDataAccessor.filteringWorker) Can't get remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.filteringWorker) Can't get remote object WorkerBean", e);
+		} catch (FinderException e) {
+			log.info("(EJBDataAccessor.filteringWorker) Can't find remote object WorkerBean",e);
+			throw new  DataAccessException("(EJBDataAccessor.filteringWorker) Can't find remote object WorkerBean", e);
+		}
    }
 }
