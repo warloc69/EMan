@@ -273,10 +273,11 @@
                    <form action="<%=request.getContextPath()%>/action" method="get">
                        <td> 
                             <input type="hidden" name="action_id" value="view_top_manager"/>
-                            <% if (work != null) { %>
+                            <% if (work != null ) { if (work.getManagerID() != null)%>
                             <input type="hidden" name="id" value="<%= work.getManagerID() %>" />
                             <% } %>
-                            <input type="submit" value="cancel" />
+                            <button><a href="<%=request.getContextPath()%>/action/" />cancel</button>
+                            
                        </td>
                   </form>
               </tr>

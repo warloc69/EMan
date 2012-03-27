@@ -276,7 +276,7 @@ public class DeptBean implements EntityBean {
 		this.context = null;
 	}
 	public BigInteger ejbFindByPrimaryKey(BigInteger id) {
-		PreparedStatement prep = null;
+		 PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
 	            connection = getConnection();

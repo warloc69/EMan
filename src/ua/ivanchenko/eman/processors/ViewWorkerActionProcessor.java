@@ -69,10 +69,20 @@ public class ViewWorkerActionProcessor implements ActionProcessor {
                 		allworkers  = access.getAllWorkers(null);
                 	}
                 	IWorker wor = null;
-                	if (req.getParameter("id") != null) {
-                			log.info("id === "+req.getParameter("id"));
-                			req.getSession().setAttribute("path", access.getPath(new BigInteger(req.getParameter("id"))));
-                			wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
+                	if (req.getParameter("id") != null) { 
+                		if ("null".equals(req.getParameter("id"))) { 
+                			log.info("redirect to index.jsp?action_id=view_top_manager");
+                			try {
+								resp.sendRedirect("index.jsp?action_id=view_top_manager");
+							} catch (IOException e) {
+								log.error("can't redirect on the showworkers.jsp",e);
+							}
+                			return;
+                		}
+                		log.info("id === "+req.getParameter("id"));           
+                		req.getSession().setAttribute("path", access.getPath(new BigInteger(req.getParameter("id"))));
+                		wor = access.getWorkerByID(new BigInteger(req.getParameter("id")));
+                		
                 	}
                 	if (req.getParameter("id") == null) {
                 		if (req.getParameter("sort") == null) {  

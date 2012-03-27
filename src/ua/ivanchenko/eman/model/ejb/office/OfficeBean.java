@@ -192,10 +192,11 @@ public class OfficeBean implements EntityBean {
 	        }
 	}
 	public void ejbRemove() {
-		try {
+		try {			
 			if (canRemove(EjbDataAccessorConst.GET_WORKER_BY_OFFICE_ID,ID)) {
+				log.warn("try to remove office with manager {mgr_id = "+ this.mgrid);
 				throw new EJBException("You can not remove office because the office is used");
-			}
+			} 
 		} catch (DataAccessException e2) {
 			log.error("cannot remove office",e2);
 		}
@@ -279,6 +280,8 @@ public class OfficeBean implements EntityBean {
 	               this.address = rset.getString(2);
 	               if (rset.getBigDecimal(3) != null) {
 	            	   this.mgrid = rset.getBigDecimal(3).toBigInteger();
+	               } else {
+	            	   this.mgrid = null;
 	               }
 	            }
 	        } catch (SQLException e) {

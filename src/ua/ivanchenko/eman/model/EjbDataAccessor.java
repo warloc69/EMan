@@ -144,15 +144,17 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public Collection<IDept> getAllDepts(String sort) throws DataAccessException {
               Collection<DeptRemote> deptRem;
 			try {
-				deptRem = getDeptHome().findAll(sort);			
+				deptRem = getDeptHome().findAll(sort);	
 				ArrayList<IDept> dep = new ArrayList<IDept>();
-	            for(DeptRemote rem: deptRem) {
-	               IDept tempDept = new Dept();
-	               tempDept.setID(rem.getID());
-	               tempDept.setTitle(rem.getTitle());
-	               tempDept.setDescription(rem.getDescription());
-	               dep.add(tempDept);
-	            }
+				if (deptRem != null) {
+		            for(DeptRemote rem: deptRem) {
+		               IDept tempDept = new Dept();
+		               tempDept.setID(rem.getID());
+		               tempDept.setTitle(rem.getTitle());
+		               tempDept.setDescription(rem.getDescription());
+		               dep.add(tempDept);
+		            }
+				}
 	            return dep;
 			} catch (RemoteException e) {
 				log.info("(EJBDataAccessor.getAllDepts) Can't get remote object DeptBean",e);
@@ -170,12 +172,14 @@ public final class EjbDataAccessor  implements IDataAccessor {
     	try {
             Collection<JobRemote> jobRem = getJobHome().findAll(sort);
             ArrayList<IJob> job = new ArrayList<IJob>();
-            for(JobRemote rem: jobRem) {
-          	  IJob tempJob = new Job();
-          	  tempJob.setID(rem.getID());
-          	  tempJob.setTitle(rem.getTitle());
-          	  tempJob.setDescription(rem.getDescription());
-          	  job.add(tempJob);
+            if (jobRem != null) {
+	            for(JobRemote rem: jobRem) {
+	          	  IJob tempJob = new Job();
+	          	  tempJob.setID(rem.getID());
+	          	  tempJob.setTitle(rem.getTitle());
+	          	  tempJob.setDescription(rem.getDescription());
+	          	  job.add(tempJob);
+	            }
             }
             return job;
     	} catch (RemoteException e) {
@@ -194,13 +198,15 @@ public final class EjbDataAccessor  implements IDataAccessor {
     	try {
             Collection<OfficeRemote> officeRem = getOfficeHome().findAll(sort);
             ArrayList<IOffice> office = new ArrayList<IOffice>();
-            for(OfficeRemote rem: officeRem) {
-          	  IOffice tempOffice = new Office();
-          	  tempOffice.setID(rem.getID());
-          	  tempOffice.setTitle(rem.getTitle());
-          	  tempOffice.setAddress(rem.getAddress());
-          	  tempOffice.setManagerID(rem.getManagerID());
-          	  office.add(tempOffice);
+            if (officeRem != null) {
+	            for(OfficeRemote rem: officeRem) {
+	          	  IOffice tempOffice = new Office();
+	          	  tempOffice.setID(rem.getID());
+	          	  tempOffice.setTitle(rem.getTitle());
+	          	  tempOffice.setAddress(rem.getAddress());
+	          	  tempOffice.setManagerID(rem.getManagerID());
+	          	  office.add(tempOffice);
+	            }
             }
             return office;
     	} catch (RemoteException e) {
@@ -219,17 +225,19 @@ public final class EjbDataAccessor  implements IDataAccessor {
     	try {
             Collection<WorkerRemote> workerRem = getWorkerHome().findAll(sort);
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
-            for(WorkerRemote rem: workerRem) {
-          	  IWorker tempWorker = new Worker();
-          	  tempWorker.setID(rem.getID());
-          	  tempWorker.setFirstName(rem.getFirstName());
-          	  tempWorker.setLastName(rem.getLastName());
-          	  tempWorker.setDepartmentID(rem.getDepartmentID());
-          	  tempWorker.setJobID(rem.getJobID());
-          	  tempWorker.setManagerID(rem.getManagerID());
-          	  tempWorker.setOfficeID(rem.getOfficeID());
-          	  tempWorker.setSalegrade(rem.getSalegrade());
-          	  worker.add(tempWorker);
+            if (workerRem != null) {
+	            for(WorkerRemote rem: workerRem) {
+	          	  IWorker tempWorker = new Worker();
+	          	  tempWorker.setID(rem.getID());
+	          	  tempWorker.setFirstName(rem.getFirstName());
+	          	  tempWorker.setLastName(rem.getLastName());
+	          	  tempWorker.setDepartmentID(rem.getDepartmentID());
+	          	  tempWorker.setJobID(rem.getJobID());
+	          	  tempWorker.setManagerID(rem.getManagerID());
+	          	  tempWorker.setOfficeID(rem.getOfficeID());
+	          	  tempWorker.setSalegrade(rem.getSalegrade());
+	          	  worker.add(tempWorker);
+	            }
             }
             return worker;
     	} catch (RemoteException e) {
@@ -247,7 +255,10 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IDept getDeptByID(BigInteger id) throws DataAccessException {
     	try {
             DeptRemote deptRem = getDeptHome().findByPrimaryKey(id);
-          	IDept tempDept = new Dept();
+          	if (deptRem == null) {
+          		return null;
+          	}
+            IDept tempDept = new Dept();
           	tempDept.setID(deptRem.getID());
           	tempDept.setTitle(deptRem.getTitle());
           	tempDept.setDescription(deptRem.getDescription());
@@ -267,6 +278,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IDept getDeptByTitle(String title) throws DataAccessException {
     	try {
             DeptRemote deptRem = getDeptHome().findByTitle(title);
+            if (deptRem == null) {
+          		return null;
+          	}
           	IDept tempDept = new Dept();
           	tempDept.setID(deptRem.getID());
           	tempDept.setTitle(deptRem.getTitle());
@@ -287,6 +301,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IJob getJobByID(BigInteger id) throws DataAccessException {
     	try {
             JobRemote jobRem = getJobHome().findByPrimaryKey(id);
+            if (jobRem == null) {
+          		return null;
+          	}
           	IJob tempJob = new Job();
           	tempJob.setID(jobRem.getID());
           	tempJob.setTitle(jobRem.getTitle());
@@ -307,6 +324,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IJob getJobByTitle(String title) throws DataAccessException {
     	try {
             JobRemote jobRem = getJobHome().findByTitle(title);
+            if (jobRem == null) {
+          		return null;
+          	}
           	IJob tempJob = new Job();
           	tempJob.setID(jobRem.getID());
           	tempJob.setTitle(jobRem.getTitle());
@@ -327,6 +347,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IOffice getOfficeByID(BigInteger id) throws DataAccessException {
     	try {
             OfficeRemote officeRem = getOfficeHome().findByPrimaryKey(id);
+            if (officeRem == null) {
+          		return null;
+          	}
           	IOffice tempOffice = new Office();
           	tempOffice.setID(officeRem.getID());
           	tempOffice.setTitle(officeRem.getTitle());
@@ -348,6 +371,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IOffice getOfficeByTitle(String title) throws DataAccessException {
     	try {
             OfficeRemote officeRem = getOfficeHome().findByTitle(title);
+            if (officeRem == null) {
+          		return null;
+          	}
           	IOffice tempOffice = new Office();
           	tempOffice.setID(officeRem.getID());
           	tempOffice.setTitle(officeRem.getTitle());
@@ -369,6 +395,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public IWorker getWorkerByID(BigInteger id) throws DataAccessException {
     	try {
             WorkerRemote workerRem = getWorkerHome().findByPrimaryKey(id);
+            if (workerRem == null) {
+          		return null;
+          	}
           	IWorker tempWorker = new Worker();
           	tempWorker.setID(workerRem.getID());
           	tempWorker.setManagerID(workerRem.getManagerID());
@@ -394,6 +423,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public Collection<IWorker> getWorkersByName(String lname) throws DataAccessException {
     	try {
             Collection<WorkerRemote> workerRem = getWorkerHome().findByName(lname);
+            if (workerRem == null) {
+          		return null;
+          	}
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -423,6 +455,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public Collection<IWorker> getWorkersByMgrID(BigInteger id, String sort) throws DataAccessException {
     	try {
             Collection<WorkerRemote> workerRem = getWorkerHome().findByManagerID(id);
+            if (workerRem == null) {
+          		return null;
+          	}
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -448,6 +483,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public Collection<IWorker> getTopManagers(String sort) throws DataAccessException {
     	try {
             Collection<WorkerRemote> workerRem = getWorkerHome().findTopManager(sort);
+            if (workerRem == null) {
+          		return null;
+          	}
             ArrayList<IWorker> worker = new ArrayList<IWorker>();
             for(WorkerRemote rem: workerRem) {
           	  IWorker tempWorker = new Worker();
@@ -477,7 +515,10 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeDept(BigInteger id) throws DataAccessException {
     	try {
-			getDeptHome().findByPrimaryKey(id).remove();
+			DeptRemote dep = getDeptHome().findByPrimaryKey(id);
+			if (dep != null) {
+				dep.remove();
+			}
 		} catch (RemoveException e) {
 			log.info("(EJBDataAccessor.removeDept) Can't remove object DeptBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.removeDept) Can't remove remote object DeptBean", e);	
@@ -496,7 +537,10 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeJob(BigInteger id) throws DataAccessException {
     	try {
-            getJobHome().findByPrimaryKey(id).remove();
+           JobRemote job =  getJobHome().findByPrimaryKey(id);
+           if (job != null) {
+        	   job.remove();
+           }
     	} catch (RemoveException e) {
 			log.info("(EJBDataAccessor.removeJob) Can't remove object JobBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.removeJob) Can't remove remote object JobBean", e);	
@@ -515,7 +559,10 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeOffice(BigInteger id) throws DataAccessException {
     	try {
-            getOfficeHome().findByPrimaryKey(id).remove();
+            OfficeRemote office = getOfficeHome().findByPrimaryKey(id);
+            if (office != null) {
+            	office.remove();
+            }
     	} catch (RemoveException e) {
 			log.info("(EJBDataAccessor.removeOffice) Can't remove object OfficeBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.removeOffice) Can't remove remote object OfficeBean", e);	
@@ -534,7 +581,10 @@ public final class EjbDataAccessor  implements IDataAccessor {
     */
     public void removeWorker(BigInteger id) throws DataAccessException {
     	try {
-            getWorkerHome().findByPrimaryKey(id).remove();
+           WorkerRemote worker =  getWorkerHome().findByPrimaryKey(id);
+           if (worker != null) {
+        	   worker.remove();
+           }
     	} catch (RemoveException e) {
 			log.info("(EJBDataAccessor.removeWorker) Can't remove object WorkerBean",e);
 			throw new  DataAccessException("(EJBDataAccessor.removeWorker) Can't remove remote object WorkerBean", e);	
@@ -554,6 +604,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public void updateDept(IDept dept) throws DataAccessException {
     	try {
             DeptRemote deptRem = getDeptHome().findByPrimaryKey(dept.getID());
+            if (deptRem == null) {
+            	return;
+            }
             deptRem.setTitle(dept.getTitle());
             deptRem.setDescription(dept.getDescription());
     	} catch (RemoteException e) {
@@ -572,6 +625,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public void updateJob(IJob job) throws DataAccessException {
     	try {
             JobRemote jobRem = getJobHome().findByPrimaryKey(job.getID());
+            if (jobRem == null) {
+            	return;
+            }
             jobRem.setTitle(job.getTitle());
             jobRem.setDescription(job.getDescription());
     	} catch (RemoteException e) {
@@ -590,6 +646,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public void updateOffice(IOffice off) throws DataAccessException {
     	try {
             OfficeRemote officeRem = getOfficeHome().findByPrimaryKey(off.getID());
+            if (officeRem == null) {
+            	return;
+            }
             officeRem.setTitle(off.getTitle());
             officeRem.setAddress(off.getAddress());
             officeRem.setManagerID(off.getManagerID());
@@ -609,6 +668,9 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public void updateWorker(IWorker worker) throws DataAccessException {
     	try {
             WorkerRemote workerRem = getWorkerHome().findByPrimaryKey(worker.getID());
+            if (workerRem == null) {
+            	return;
+            }
             workerRem.setFirstName(worker.getFirstName());
             workerRem.setLastName(worker.getLastName());
             workerRem.setDepartmentID(worker.getDepartmentID());
@@ -627,12 +689,15 @@ public final class EjbDataAccessor  implements IDataAccessor {
     public Collection<IWorker> getPath(BigInteger id) throws DataAccessException {
     	try {
             Collection<WorkerRemote> workerRem = getWorkerHome().findPath(id);
+            
             LinkedList<IWorker> worker = new LinkedList<IWorker>();
-            for(WorkerRemote rem: workerRem) {
-          	  IWorker tempWorker = new Worker();
-          	  tempWorker.setID(rem.getID());
-          	  tempWorker.setLastName(rem.getLastName());
-          	  worker.add(tempWorker);
+            if (workerRem != null) { 
+	            for(WorkerRemote rem: workerRem) {
+	          	  IWorker tempWorker = new Worker();
+	          	  tempWorker.setID(rem.getID());
+	          	  tempWorker.setLastName(rem.getLastName());
+	          	  worker.add(tempWorker);
+	            }
             }
             return worker;
     	} catch (RemoteException e) {
@@ -647,17 +712,19 @@ public final class EjbDataAccessor  implements IDataAccessor {
     	try {
             Collection<WorkerRemote> workerRem = getWorkerHome().findFilteringWorker(id, filters);
             LinkedList<IWorker> worker = new LinkedList<IWorker>();
-            for(WorkerRemote rem: workerRem) {
-          	  IWorker tempWorker = new Worker();
-          	  tempWorker.setID(rem.getID());
-          	  tempWorker.setFirstName(rem.getFirstName());
-          	  tempWorker.setLastName(rem.getLastName());
-          	  tempWorker.setDepartmentID(rem.getDepartmentID());
-          	  tempWorker.setJobID(rem.getJobID());
-          	  tempWorker.setManagerID(rem.getManagerID());
-          	  tempWorker.setOfficeID(rem.getOfficeID());
-          	  tempWorker.setSalegrade(rem.getSalegrade());
-          	  worker.add(tempWorker);
+            if (workerRem !=  null) {
+	            for(WorkerRemote rem: workerRem) {
+	          	  IWorker tempWorker = new Worker();
+	          	  tempWorker.setID(rem.getID());
+	          	  tempWorker.setFirstName(rem.getFirstName());
+	          	  tempWorker.setLastName(rem.getLastName());
+	          	  tempWorker.setDepartmentID(rem.getDepartmentID());
+	          	  tempWorker.setJobID(rem.getJobID());
+	          	  tempWorker.setManagerID(rem.getManagerID());
+	          	  tempWorker.setOfficeID(rem.getOfficeID());
+	          	  tempWorker.setSalegrade(rem.getSalegrade());
+	          	  worker.add(tempWorker);
+	            }
             }
             return worker;
     	} catch (RemoteException e) {

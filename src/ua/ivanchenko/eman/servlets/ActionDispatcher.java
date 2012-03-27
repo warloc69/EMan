@@ -39,9 +39,6 @@ public class ActionDispatcher extends HttpServlet {
 			ActionProcessorsFactory apf = new ActionProcessorsFactory();
 			ActionProcessor proc = apf.getProcessor(request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1],config);
 			log.info("doGet{action_id:"+request.getParameterValues("action_id")[request.getParameterValues("action_id").length-1]+"} {URI:"+request.getRequestURI()+"} {id:"+request.getParameter("id")+"} query string:"+ request.getQueryString());
-			//log.info("doGet{action_id:"+request.getParameterValues("action_id")[0] + "}");
-			//log.info("doGet{action_id:"+request.getParameterValues("action_id")[1] + "}");
-			//request.
 			log.info(" query string:"+ request.getQueryString());
 			proc.process(request, response, accessor);
 		} catch (CreateProcessorException e) {
