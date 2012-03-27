@@ -6,7 +6,9 @@
         <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
         <user-name>system</user-name> 
         <password>student</password>
-      <!--   <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter</exception-sorter-class-name> -->
+        <min-pool-size>5</min-pool-size>
+        <max-pool-size>20</max-pool-size> 
+        <idle-timeout-minutes>1</idle-timeout-minutes>
         <valid-connection-checker-class-name>org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker</valid-connection-checker-class-name>
         <metadata>
              <type-mapping>Oracle9i</type-mapping> 
