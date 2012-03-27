@@ -21,9 +21,9 @@
     <table border="2">
         <tr>
             <%if(request.getParameter("select") == null)  { %>
-               <td></td><td><a href="<%=request.getContextPath()%>/action?action_id=view_job&sort=title"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/?action_id=view_job&sort=description"><p1>Description</p1></a></td>
+               <td></td><td><a href="<%=request.getContextPath()%>/action?action_id=view_job&sort=title"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/action?action_id=view_job&sort=description"><p1>Description</p1></a></td>
              <%} else { %>
-                <td></td><td><a href="<%=request.getContextPath()%>/action?action_id=view_job&sort=title&select=true"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/?action_id=view_job&sort=description&select=true"><p1>Description</p1></a></td>
+                <td></td><td><a href="<%=request.getContextPath()%>/action?action_id=view_job&sort=title&select=true"><p1>Title</p1></a></td><td><a href="<%=request.getContextPath()%>/action?action_id=view_job&sort=description&select=true"><p1>Description</p1></a></td>
              <%} %>
         </tr>
      <%

@@ -41,7 +41,11 @@ public class FilterActionProcessor implements ActionProcessor {
 		}	
 		Collection<IWorker> workers = null;
 		if (req.getParameter("id") != null && !"null".equalsIgnoreCase(req.getParameter("id"))) {
-			workers = access.filteringWorker(new BigInteger(req.getParameter("id")),filters);		
+			try {
+				workers = access.filteringWorker(new BigInteger(req.getParameter("id")),filters);		
+			} catch (NumberFormatException e) {
+				workers = access.filteringWorker(null,filters);
+			}
 		} else {
 			workers = access.filteringWorker(null,filters);
 		}

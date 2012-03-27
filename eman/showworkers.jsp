@@ -125,11 +125,23 @@
 		          <input type="hidden" name="action_id" value="filter" /> 
 		          <td><input type="submit" value="filtering" /></td>
 		          <%if (request.getParameter("id") != null) {
-		              if (request.getParameter("select") == null) { %>               
-                         <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&id=<%=request.getParameter("id")%>" onclick="clear()">&nbsp; Clear &nbsp;</a></td>   
-                      <%} else { %>  
-                        <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true&id=<%=request.getParameter("id")%>" onclick="clear()">&nbsp; Clear &nbsp;</a></td>   
-                      <%} %>
+		        	  try { 
+                          new BigInteger(request.getParameter("id"));  
+			              if (request.getParameter("select") == null) { %>               
+	                         <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&id=<%=request.getParameter("id")%>" onclick="clear()">&nbsp; Clear &nbsp;</a></td>   
+	                      <%} else { %>  
+	                        <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true&id=<%=request.getParameter("id")%>" onclick="clear()">&nbsp; Clear &nbsp;</a></td>   
+	                      <%} 
+		        	  } catch (NumberFormatException e) {
+		        		  %>
+		        		  <%if (request.getParameter("select") == null) {%>
+                            <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager" onclick="clear()">&nbsp; Clear &nbsp;</a></td>
+                       <%} else { %>
+                            <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&select=true" onclick="clear()">&nbsp; Clear &nbsp;</a></td>
+                       <%} %> 
+		        		  <%
+		        	  }
+                      %>
                   <%}  else  {%>
                         <%if (request.getParameter("select") == null) {%>
                             <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager" onclick="clear()">&nbsp; Clear &nbsp;</a></td>

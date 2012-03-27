@@ -22,9 +22,9 @@
     <table border="2">
         <tr>
              <%if(request.getParameter("select") == null)  { %>
-                <th></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=TITLE"><p1>Title</p1></a></th><th><a href="<%=request.getContextPath()%>/?action_id=view_office&sort=ADDRESS"><p1>Address</p1></a></th><th><a href="<%=request.getContextPath()%>/?action_id=view_office&sort=MANAGER"><p1>Manager</p1></a></th>
+                <th></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=TITLE"><p1>Title</p1></a></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=ADDRESS"><p1>Address</p1></a></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=MANAGER"><p1>Manager</p1></a></th>
             <%} else { %>
-                <th></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=TITLE&select=true"><p1>Title</p1></a></th><th><a href="<%=request.getContextPath()%>/?action_id=view_office&sort=ADDRESS&select=true"><p1>Address</p1></a></th><th><a href="<%=request.getContextPath()%>/?action_id=view_office&sort=MANAGER&select=true"><p1>Manager</p1></a></th>
+                <th></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=TITLE&select=true"><p1>Title</p1></a></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=ADDRESS&select=true"><p1>Address</p1></a></th><th><a href="<%=request.getContextPath()%>/action?action_id=view_office&sort=MANAGER&select=true"><p1>Manager</p1></a></th>
             <%} %>
         </tr>
 	     <%
