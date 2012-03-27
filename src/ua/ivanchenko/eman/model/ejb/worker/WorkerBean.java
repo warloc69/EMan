@@ -31,48 +31,56 @@ public class WorkerBean implements EntityBean {
     private BigInteger officeid = null;
     private double salegrade = 0;
 	private EntityContext context;
+	private boolean changed = false;
     
 	public String getFirstName() throws java.rmi.RemoteException{
 		return fname;
 	}
 	public void setFirstName(String fname) throws java.rmi.RemoteException{
 		this.fname = fname;
+		this.changed = true;
 	}
 	public String getLastName() throws java.rmi.RemoteException{
 		return lname;
 	}
 	public void setLastName(String lname) throws java.rmi.RemoteException{
 		this.lname = lname;
+		this.changed = true;
 	}
 	public BigInteger getManagerID() throws java.rmi.RemoteException{
 		return mgrid;
 	}
 	public void setManagerID(BigInteger id) throws java.rmi.RemoteException{
 		this.mgrid = id;
+		this.changed = true;
 	}
 	public BigInteger getDepartmentID() throws java.rmi.RemoteException{
 		return depid;
 	}
 	public void setDepartmentID(BigInteger id) throws java.rmi.RemoteException{
 		this.depid = id;
+		this.changed = true;
 	}
 	public BigInteger getJobID() throws java.rmi.RemoteException{
 		return jobid;
 	}
 	public void setJobID(BigInteger id) throws java.rmi.RemoteException{
 		this.jobid = id;
+		this.changed = true;
 	}
 	public BigInteger getOfficeID() throws java.rmi.RemoteException{
 		return officeid;
 	}
 	public void setOfficeID(BigInteger id) throws java.rmi.RemoteException{
 		this.officeid = id;
+		this.changed = true;
 	}
 	public double getSalegrade() throws java.rmi.RemoteException{
 		return salegrade;
 	}
 	public void setSalegrade(double sale) throws java.rmi.RemoteException{
 		this.salegrade = sale;
+		this.changed = true;
 	}
 	public BigInteger getID() throws java.rmi.RemoteException{
 		return ID;
@@ -117,6 +125,7 @@ public class WorkerBean implements EntityBean {
 	            this.jobid = job_id;
 	            this.depid = dept_id;
 	            this.salegrade = sale;
+	            this.changed = true;
 	            return ID;
 	        }catch (SQLException e) {
 	            log.error("ejbCreate WorkerBean sql error",e);
@@ -168,6 +177,9 @@ public class WorkerBean implements EntityBean {
 	public void ejbStore()  throws java.rmi.RemoteException{
 		 PreparedStatement prep = null;
 	        Connection connection = null;
+	        if (!this.changed) {
+	        	return;
+	        }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.UPDATE_WORKER);
@@ -185,6 +197,7 @@ public class WorkerBean implements EntityBean {
 	            prep.setBigDecimal(8, new BigDecimal(ID));
 	            prep.executeUpdate();
 	            connection.commit();
+	            this.changed = false;
 	        } catch (SQLException e) {
 	            log.error("ejbStore WorkerBean sql error",e);
 	            try {
@@ -209,11 +222,15 @@ public class WorkerBean implements EntityBean {
 	}
 	public void ejbActivate() throws java.rmi.RemoteException{		
 		ID = (BigInteger) context.getPrimaryKey();
+		this.changed = false;
 	}
 	
 	public void ejbLoad() throws java.rmi.RemoteException{
 		 PreparedStatement prep = null;
 	     Connection connection = null;
+	     if (this.fname != null) {
+	    	 return;
+	     }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_WORKER_BY_ID);
@@ -256,6 +273,7 @@ public class WorkerBean implements EntityBean {
         this.jobid = null;
         this.depid = null;
         this.salegrade = 0;
+        this.changed = false;
 		
 	}
 	public void setEntityContext(EntityContext entityContext)  {

@@ -28,6 +28,7 @@ public class OfficeBean implements EntityBean {
     private String title = null;
     private String address = null;
     private BigInteger mgrid = null;
+    private boolean changed = false;
     /**
      * Method returns address.
      */
@@ -40,6 +41,7 @@ public class OfficeBean implements EntityBean {
      */
     public void setAddress(String address) {
         this.address = address;
+        this.changed = true;
     }
     /**
      * Method returns manager's identifier.
@@ -53,6 +55,7 @@ public class OfficeBean implements EntityBean {
      */
     public void setManagerID(BigInteger mgrid) {
         this.mgrid = mgrid;
+        this.changed = true;
     }
 
     /**
@@ -73,6 +76,7 @@ public class OfficeBean implements EntityBean {
 	 */
 	public void setTitle(String title) throws RemoteException {
 		this.title = title;
+		this.changed = true;
 	}
 	public void ejbPostCreate(String title,String address,BigInteger mgrid) throws CreateException, DataAccessException {
 		
@@ -103,6 +107,7 @@ public class OfficeBean implements EntityBean {
 	            this.address = address;
 	            this.mgrid = mgrid;
 	            this.title = title;
+	            this.changed = true;
 	            return ID;
 	        }catch (SQLException e) {
 	            log.error("ejbCreate OfficeBean sql error",e);
@@ -119,8 +124,7 @@ public class OfficeBean implements EntityBean {
 	}
 	public void ejbRemove() {
 		PreparedStatement prep = null;
-        Connection connection = null;
-	
+        Connection connection = null;	
 		try {			
 			if (EjbUtil.canRemove(EjbDataAccessorConst.GET_WORKER_BY_OFFICE_ID,ID)) {
 				log.warn("try to remove office with worker");
@@ -153,6 +157,9 @@ public class OfficeBean implements EntityBean {
 	public void ejbStore()  {
 		 PreparedStatement prep = null;
 	        Connection connection = null;
+	        if (!this.changed) {
+	        	return;
+	        }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.UPDATE_OFFICE);
@@ -166,6 +173,8 @@ public class OfficeBean implements EntityBean {
 	            prep.setBigDecimal(4, new BigDecimal(ID));
 	            prep.executeUpdate();
 	            connection.commit();
+	            this.changed = false;
+	           
 	        } catch (SQLException e) {
 	            log.error("ejbStore OfficeBean sql error",e);
 	            try {
@@ -188,10 +197,14 @@ public class OfficeBean implements EntityBean {
 	}
 	public void ejbActivate() {
 		ID = (BigInteger) context.getPrimaryKey();
+		this.changed = false;
 	}
 	public void ejbLoad() {
 		 PreparedStatement prep = null;
 	     Connection connection = null;
+	     if (this.title != null) {
+	    	 return;
+	     }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_OFFICE_BY_ID);
@@ -206,6 +219,7 @@ public class OfficeBean implements EntityBean {
 	               } else {
 	            	   this.mgrid = null;
 	               }
+	               this.changed = false;
 	            }
 	        } catch (SQLException e) {
 	            log.error("ejbLoad OfficeBean sql error",e);
@@ -225,6 +239,7 @@ public class OfficeBean implements EntityBean {
 		this.title = null;
 		this.address = null;
 		this.mgrid = null;
+		this.changed = false;
 	}
 	public void setEntityContext(EntityContext entityContext)  {
 		this.context = entityContext;

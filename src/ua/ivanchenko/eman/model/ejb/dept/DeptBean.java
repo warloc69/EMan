@@ -27,6 +27,7 @@ public class DeptBean implements EntityBean {
 	private String title;
 	private String desc;
 	private EntityContext context;
+	private boolean changed = false;
 	
     /**
 	  * Method returns department's identifier.
@@ -52,6 +53,7 @@ public class DeptBean implements EntityBean {
 	 */
 	public void setTitle(String title) throws RemoteException {
 		this.title = title;
+		this.changed = true;
 	}
 	/**
 	 * method sets department's description. 
@@ -59,6 +61,7 @@ public class DeptBean implements EntityBean {
 	 */
 	public void setDescription(String desc) throws RemoteException {
 		this.desc = desc;
+		this.changed = true;
 	}
 	public void ejbPostCreate(String title, String desc) throws CreateException, DataAccessException {
 	}
@@ -82,6 +85,7 @@ public class DeptBean implements EntityBean {
 	            connection.commit();
 	            this.title=title;
 	            this.desc=desc;
+	            this.changed = true;
 	            return ID;
 	        }catch (SQLException e) {
 	            log.error("ejbCreate DeptBean sql error",e);
@@ -131,6 +135,9 @@ public class DeptBean implements EntityBean {
 	public void ejbStore()  {
 		 PreparedStatement prep = null;
 	        Connection connection = null;
+	        if (!this.changed) {
+	        	return;
+	        }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.UPDATE_DEPT);
@@ -139,6 +146,7 @@ public class DeptBean implements EntityBean {
 	            prep.setBigDecimal(3, new BigDecimal(ID));
 	            prep.executeUpdate();
 	            connection.commit();
+	            this.changed = false;
 	        } catch (SQLException e) {
 	            log.error("ejbStore DeptBean sql error",e);
 	            try {
@@ -161,10 +169,14 @@ public class DeptBean implements EntityBean {
 	}
 	public void ejbActivate() {
 		ID = (BigInteger) context.getPrimaryKey();
+		this.changed = false;
 	}
 	public void ejbLoad() {
 		 PreparedStatement prep = null;
 	     Connection connection = null;
+	     if (this.title != null) {
+	    	 return;
+	     }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.GET_DEPTS_BY_ID);
@@ -192,6 +204,7 @@ public class DeptBean implements EntityBean {
 		ID = null;
 		this.title = null;
 		this.desc = null;
+		this.changed = false;
 	}
 	public void setEntityContext(EntityContext entityContext)  {
 		this.context = entityContext;

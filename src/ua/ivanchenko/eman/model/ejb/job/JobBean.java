@@ -27,6 +27,7 @@ public class JobBean implements EntityBean {
 	private String title;
 	private String desc;
 	private EntityContext context;	
+	private boolean changed = false;
     /**
 	  * Method returns department's identifier.
 	  */	
@@ -51,6 +52,7 @@ public class JobBean implements EntityBean {
 	 */
 	public void setTitle(String title) throws RemoteException {
 		this.title = title;
+		this.changed = true;
 	}
 	/**
 	 * method sets department's description. 
@@ -58,6 +60,7 @@ public class JobBean implements EntityBean {
 	 */
 	public void setDescription(String desc) throws RemoteException {
 		this.desc = desc;
+		this.changed = true;
 	}
 	public void ejbPostCreate(String title, String desc) throws CreateException, DataAccessException {
 	}
@@ -81,6 +84,7 @@ public class JobBean implements EntityBean {
 	            connection.commit();
 	            this.title = title;
 	            this.desc = desc;
+	            this.changed = true;
 	            return ID;
 	        }catch (SQLException e) {
 	            log.error("ejbCreate JobBean sql error",e);
@@ -130,6 +134,9 @@ public class JobBean implements EntityBean {
 	public void ejbStore()  {
 		 PreparedStatement prep = null;
 	        Connection connection = null;
+	        if (!this.changed) {
+	        	return;
+	        }
 	        try {
 	            connection = EjbUtil.getConnection();
 	            prep = connection.prepareStatement(EjbDataAccessorConst.UPDATE_JOB);
@@ -138,6 +145,7 @@ public class JobBean implements EntityBean {
 	            prep.setBigDecimal(3, new BigDecimal(ID));
 	            prep.executeUpdate();
 	            connection.commit();
+	            this.changed = false;
 	        } catch (SQLException e) {
 	            log.error("ejbStore JobBean sql error",e);
 	            try {
@@ -160,8 +168,12 @@ public class JobBean implements EntityBean {
 	}
 	public void ejbActivate() {
 		ID = (BigInteger) context.getPrimaryKey();
+		this.changed = false;
 	}
 	public void ejbLoad() {
+		if (this.title != null) {
+			return;
+		}
 		 PreparedStatement prep = null;
 	     Connection connection = null;
 	        try {
@@ -191,6 +203,7 @@ public class JobBean implements EntityBean {
 		ID = null;
 		this.title = null;
 		this.desc = null;
+		this.changed = false;
 	}
 	public void setEntityContext(EntityContext entityContext)  {
 		this.context = entityContext;
