@@ -62,10 +62,14 @@
          if (workers != null && request.getParameter("tab") == null) {%>
        <table border="2">  
 	        <tr>   
-		        <%if (request.getParameter("id") != null && request.getParameter("select") == null) {%>
+		        <%if (request.getParameter("id") != null && request.getParameter("select") == null) {
+		         try { new BigInteger(request.getParameter("id"));
+		        %>
 		           <th colspan="7"></th><td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&id=<%= request.getParameter("id") %>">subordinate</a></td>
 		           <td><a href="<%=request.getContextPath()%>/action?action_id=view_top_manager&tab=details&id=<%= request.getParameter("id") %>">details</a></td>
-		        <%}%>
+		        <% } catch (NumberFormatException e) {
+		           }	
+		        }%>
 	        </tr>    
 	        <tr>
 	           <% if(request.getParameter("select") == null)  {%>
